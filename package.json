@@ -1,0 +1,22 @@
+{
+  "name": "moovicar-express-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fatahou844/moovicar-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fatahou844/moovicar-api/issues"
+  },
+  "homepage": "https://github.com/Fatahou844/moovicar-api#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
