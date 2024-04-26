@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.changeColumn("reservations", "status", {
+    await queryInterface.changeColumn("Reservations", "status", {
       type: Sequelize.ENUM("0", "1", "2", "3", "4"), // Modifiez le type et la précision selon vos besoins
       allowNull: false,
       defaultValue: "0", // Assurez-vous que cette valeur correspond à celle actuellement définie dans votre modèle

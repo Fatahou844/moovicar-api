@@ -12,7 +12,7 @@ module.exports = {
       reservationId: {
         type: Sequelize.INTEGER,
         references: {
-          model: "reservations", // Assurez-vous que c'est le nom correct de la table option
+          model: "Reservations", // Assurez-vous que c'est le nom correct de la table option
           key: "reservationId",
         },
         onUpdate: "CASCADE",

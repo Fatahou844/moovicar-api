@@ -9,19 +9,19 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("vehicles", "principalPhotos", {
+    await queryInterface.addColumn("Vehicles", "principalPhotos", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
-    await queryInterface.addColumn("vehicles", "lateralPhotos", {
+    await queryInterface.addColumn("Vehicles", "lateralPhotos", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
-    await queryInterface.addColumn("vehicles", "interiorPhotos", {
+    await queryInterface.addColumn("Vehicles", "interiorPhotos", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
-    await queryInterface.addColumn("vehicles", "SupplementPhotos", {
+    await queryInterface.addColumn("Vehicles", "SupplementPhotos", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
@@ -34,11 +34,11 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("vehicles", "principalPhoto");
-    await queryInterface.removeColumn("vehicles", "lateralPhotos");
+    await queryInterface.removeColumn("Vehicles", "principalPhoto");
+    await queryInterface.removeColumn("Vehicles", "lateralPhotos");
 
-    await queryInterface.removeColumn("vehicles", "interiorPhotos");
+    await queryInterface.removeColumn("Vehicles", "interiorPhotos");
 
-    await queryInterface.removeColumn("vehicles", "SupplementPhotos");
+    await queryInterface.removeColumn("Vehicles", "SupplementPhotos");
   },
 };

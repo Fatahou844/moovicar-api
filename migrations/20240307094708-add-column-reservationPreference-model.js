@@ -10,7 +10,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.addColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "HomePeriodTempo",
       {
         type: Sequelize.ENUM("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
@@ -19,7 +19,7 @@ module.exports = {
     );
 
     await queryInterface.addColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "LocationDelivereyPeriodTempo",
       {
         type: Sequelize.ENUM("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
@@ -36,11 +36,11 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await queryInterface.removeColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "LocationDelivereyPeriodTempo"
     );
     await queryInterface.removeColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "HomePeriodTempo"
     );
   },

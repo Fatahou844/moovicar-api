@@ -9,11 +9,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("deliverylocations", "deliveryCoords", {
+    await queryInterface.addColumn("DeliveryLocations", "deliveryCoords", {
       type: Sequelize.STRING,
       allowNull: true, // ou false, selon vos besoins
     });
-    await queryInterface.addColumn("deliverylocations", "deliveryAddressName", {
+    await queryInterface.addColumn("DeliveryLocations", "deliveryAddressName", {
       type: Sequelize.STRING,
       allowNull: true, // ou false, selon vos besoins
     });
@@ -26,9 +26,9 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("deliverylocations", "deliveryCoords");
+    await queryInterface.removeColumn("DeliveryLocations", "deliveryCoords");
     await queryInterface.removeColumn(
-      "deliverylocations",
+      "DeliveryLocations",
       "deliveryAddressName"
     );
   },

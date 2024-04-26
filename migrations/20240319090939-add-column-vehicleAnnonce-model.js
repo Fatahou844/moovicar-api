@@ -9,7 +9,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("vehiculeannonces", "status", {
+    await queryInterface.addColumn("VehiculeAnnonces", "status", {
       type: Sequelize.ENUM("0", "1", "2", "3"),
       allowNull: true, // ou false, selon vos besoins
     });
@@ -22,6 +22,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("vehiculeannonces", "status");
+    await queryInterface.removeColumn("VehiculeAnnonces", "status");
   },
 };

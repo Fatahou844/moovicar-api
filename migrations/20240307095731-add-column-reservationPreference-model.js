@@ -9,10 +9,10 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("reservationpreferences", "vehiculeId", {
+    await queryInterface.addColumn("ReservationPreferences", "vehiculeId", {
       type: Sequelize.INTEGER,
       references: {
-        model: "vehicles", // Assurez-vous que c'est le nom correct de la table option
+        model: "Vehicles", // Assurez-vous que c'est le nom correct de la table option
         key: "id",
       },
       onUpdate: "CASCADE",
@@ -20,7 +20,7 @@ module.exports = {
     });
 
     await queryInterface.removeColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "reservationId"
     );
   },
@@ -32,6 +32,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("reservationpreferences", "vehiculeId");
+    await queryInterface.removeColumn("ReservationPreferences", "vehiculeId");
   },
 };

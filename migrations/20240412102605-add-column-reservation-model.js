@@ -9,11 +9,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("reservations", "vehiculeAnnonceId", {
+    await queryInterface.addColumn("Reservations", "vehiculeAnnonceId", {
       type: Sequelize.INTEGER,
       allowNull: true,
       references: {
-        model: "vehiculeannonces", // Assurez-vous que c'est le nom correct de la table option
+        model: "VehiculeAnnonces", // Assurez-vous que c'est le nom correct de la table option
         key: "vehiculeAnnonceId",
       },
       onUpdate: "CASCADE",
@@ -28,6 +28,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("reservations", "vehiculeAnnonceId");
+    await queryInterface.removeColumn("Reservations", "vehiculeAnnonceId");
   },
 };

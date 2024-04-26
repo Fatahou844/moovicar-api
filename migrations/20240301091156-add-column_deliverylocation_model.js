@@ -10,22 +10,22 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.addColumn(
-      "deliverylocations",
+      "DeliveryLocations",
       "deliveryLocationActive",
       {
         type: Sequelize.ENUM("0", "1"),
         allowNull: true, // ou false, selon vos besoins
       }
     );
-    await queryInterface.addColumn("deliverylocations", "deliveryCosts", {
+    await queryInterface.addColumn("DeliveryLocations", "deliveryCosts", {
       type: Sequelize.FLOAT,
       allowNull: true, // ou false, selon vos besoins
     });
-    await queryInterface.addColumn("deliverylocations", "PriseEnChargeMethod", {
+    await queryInterface.addColumn("DeliveryLocations", "PriseEnChargeMethod", {
       type: Sequelize.ENUM("0", "1", "2", "3"),
       allowNull: true, // ou false, selon vos besoins
     });
-    await queryInterface.addColumn("deliverylocations", "MoreInfo", {
+    await queryInterface.addColumn("DeliveryLocations", "MoreInfo", {
       type: Sequelize.STRING,
       allowNull: true, // ou false, selon vos besoins
     });
@@ -39,14 +39,14 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await queryInterface.removeColumn(
-      "deliverylocations",
+      "DeliveryLocations",
       "deliveryLocationActive"
     );
-    await queryInterface.removeColumn("deliverylocations", "deliveryCosts");
+    await queryInterface.removeColumn("DeliveryLocations", "deliveryCosts");
     await queryInterface.removeColumn(
-      "deliverylocations",
+      "DeliveryLocations",
       "PriseEnChargeMethod"
     );
-    await queryInterface.removeColumn("deliverylocations", "MoreInfo");
+    await queryInterface.removeColumn("DeliveryLocations", "MoreInfo");
   },
 };

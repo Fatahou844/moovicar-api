@@ -9,15 +9,15 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("userprofiles", "OpenID", {
+    await queryInterface.addColumn("UserProfiles", "OpenID", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
-    await queryInterface.addColumn("userprofiles", "access_tokenPaypal", {
+    await queryInterface.addColumn("UserProfiles", "access_tokenPaypal", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
-    await queryInterface.addColumn("userprofiles", "app_id", {
+    await queryInterface.addColumn("UserProfiles", "app_id", {
       type: Sequelize.STRING,
       defaultValue: null,
     });
@@ -30,9 +30,9 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("userprofiles", "OpenID");
-    await queryInterface.removeColumn("userprofiles", "access_tokenPaypal");
+    await queryInterface.removeColumn("UserProfiles", "OpenID");
+    await queryInterface.removeColumn("UserProfiles", "access_tokenPaypal");
 
-    await queryInterface.removeColumn("userprofiles", "app_id");
+    await queryInterface.removeColumn("UserProfiles", "app_id");
   },
 };

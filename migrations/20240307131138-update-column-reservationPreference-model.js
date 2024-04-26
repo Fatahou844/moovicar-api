@@ -10,7 +10,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.changeColumn(
-      "reservationpreferences",
+      "ReservationPreferences",
       "reservationsInstantanne",
       {
         type: Sequelize.ENUM("0", "1"), // Modifiez le type et la précision selon vos besoins

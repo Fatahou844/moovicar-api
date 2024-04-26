@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "vehiclemodels", // Assurez-vous que c'est le nom correct de la table modèle
+          model: "VehicleModels", // Assurez-vous que c'est le nom correct de la table modèle
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -34,7 +34,7 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER,
         references: {
-          model: "userprofiles", // Assurez-vous que c'est le nom correct de la table modèle
+          model: "UserProfiles", // Assurez-vous que c'est le nom correct de la table modèle
           key: "id",
         },
         onUpdate: "CASCADE",
