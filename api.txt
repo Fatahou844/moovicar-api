@@ -1,0 +1,269 @@
+app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/vehicleModels", vehicleModelRoutes);
+app.use("/api/vehicleOptions", vehicleOptionsRoutes);
+app.use("/api/vehicleOptionRecords", vehicleOptionRecordsRoutes);
+app.use("/api/vehicleAnnonces", vehicleAnnoncesRoutes);
+http://localhost:3001/api/vehicleAnnonces/search-listing?latitude=45.19131&longitude=5.714275
+http://localhost:3001/api/vehicles
+http://localhost:3001/api/vehicles/searchbyid     or /searchbyuserid
+http://localhost:3001/api/vehicleAnnonces/getannoncebyid/1
+/api/facturationAddress
+
+http://localhost:3001/api/vehicleAnnonces/getbyvehiculeid/59
+http://localhost:3001/api/reservations/getbydriverid/1
+http://localhost:3001/api/reservations/getbyid/1
+
+
+
+
+GET
+	https://turo.com/api/vehicle/daily_pricing?end=02/29/2024&start=02/01/2024&vehicleId=2436288
+
+    {
+        "0": {
+            "custom": false,
+            "date": "2024-02-01",
+            "localizedDayOfWeek": "jeudi",
+            "localizedShortDayOfWeek": "jeu.",
+            "price": 25,
+            "priceEditable": true,
+            "priceWithCurrency": {
+                "amount": 25,
+                "currencyCode": "EUR"
+            },
+            "source": "DEFAULT",
+            "wholeDayUnavailable": false
+        }
+    }  #Pour tous les jours du mois à afficher dans le calendrier
+
+    #availability
+    Jour, Heure ( Toujours disponible ou pas ): Toujours disponible veut dire (Minuit - 23 h 59)
+
+    Emplacements et livraison (Domicile, Livraison de retour, Lieu personnalisé actif ou inactif, Emplacements et livraison  ) 
+    Réduction sur la livraison ( à proposer, voyage de plus d'une joournée, 2 j, 3 j, 4j , 5j )
+
+    Distance incluse par jour
+
+
+    Une annonce est affilié à un véhicule 
+    Un véhicule qui est disponible sur des jours d'un calendrier entre un intervalle d'Heure
+    Disponibilité qui est associé à un prix 
+    Emplacements et livraison ( une adresse domicile, une adresse de retour, lieu personnalisé par le client si c'est actif)
+    Réducation sur la livraison ( à proposer ou pas )
+
+    ça permet de calculer le prix d'une reservation d'un véhicule entre une startDate et une endDate
+
+    Configuration des heures de disponibilités 
+    Prix par jour
+    Prix personnalisé pour une date spécifique
+    Reduction des prix
+    pour 3 j ou plus 
+    pour 7 j ou plus 
+    pour 2 semaines
+    pour 30 j ou pluspour deux mois
+
+    Réduction pour la réservation anticipée
+
+
+    POST
+	https://turo.com/api/vehicle/calendar/add_unavailability
+
+    -----------------------------37695962793795047730551756022
+Content-Disposition: form-data; name="startDate"
+
+02/15/2024
+-----------------------------37695962793795047730551756022
+Content-Disposition: form-data; name="endDate"
+
+02/16/2024
+-----------------------------37695962793795047730551756022
+Content-Disposition: form-data; name="startTime"
+
+19:00
+-----------------------------37695962793795047730551756022
+Content-Disposition: form-data; name="endTime"
+
+11:00
+-----------------------------37695962793795047730551756022
+Content-Disposition: form-data; name="vehicleId"
+
+2436288
+-----------------------------37695962793795047730551756022--
+
+PUT
+	https://turo.com/api/drivers/37287049/business_hours
+
+GET
+	https://turo.com/api/drivers/37287049/business_hours?locationType=POINT_OF_INTEREST
+
+Unavailability (startDate, enDate, startTime, endTime, vehicleId) par défaut la voiture est disponible chaque jour 
+availability (alwaysAvailable(0,1), WeekId, fromTime, untilTime, vehicleId, Type(ALWAYS, CUSTOM), locationType(HOME, POINT_OF_INTEREST))
+WeekId( MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
+Daily_pricing(start, end, price, vehicleId, custom(true, false), source(OWNER, false)) par défaut une valeur
+Price(vehicleId)
+
+{
+	"currentPrice": {
+		"defaultDaily": 25,
+		"defaultDailyWithCurrency": {
+			"amount": 25,
+			"currencyCode": "EUR"
+		},
+		"monthlyDiscountPercentage": 25,
+		"threeDayDiscountPercentage": 5,
+		"threeMonthDiscountPercentage": 0,
+		"threeWeekDiscountPercentage": 0,
+		"twoMonthDiscountPercentage": 30,
+		"twoWeekDiscountPercentage": 20,
+		"weeklyDiscountPercentage": 15
+	}
+}
+
+
+GET
+	https://turo.com/api/vehicle/calendar?vehicleId=2436288
+
+    {
+	"calendarItems": [
+		{
+			"driver": {
+				"allStarHost": false,
+				"firstName": "Mykhailo",
+				"id": 34217102,
+				"image": {
+					"darkModeImageUrl": null,
+					"id": null,
+					"originalImageUrl": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.jpg",
+					"placeholder": false,
+					"resizableUrlTemplate": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.{width}x{height}.jpg",
+					"thumbnails": {
+						"84x84": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.84x84.jpg",
+						"300x300": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.300x300.jpg",
+						"225x225": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.300x300.jpg",
+						"32x32": "https://images.turo.com/media/driver/M9GqNi-GQUCCRa3xyJ3RTQ.32x32.jpg"
+					},
+					"verified": false
+				},
+				"lastName": "N.",
+				"name": "Mykhailo N.",
+				"proHost": false,
+				"url": "https://turo.com/fr/fr/drivers/34217102"
+			},
+			"ownerEarnings": "49,20 €",
+			"ownerReservation": false,
+			"recurring": false,
+			"reservationId": 28589659,
+			"reservationUrl": "https://turo.com/reservation/28589659",
+			"unavailabilityInterval": {
+				"end": {
+					"epochMillis": 1704117601000,
+					"localDate": "2024-01-01",
+					"localTime": "15:00"
+				},
+				"start": {
+					"epochMillis": 1703944803000,
+					"localDate": "2023-12-30",
+					"localTime": "15:00"
+				}
+			}
+		},
+	
+	],
+}
+
+WeekId( MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
+
+
+Table Disponibilité (Availability) :
+
+    AvailabilityID (Clé primaire)
+    VehicleID (Clé étrangère vers la table Véhicule)
+    WeekDAY(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
+    fromTime
+    untilTime
+    Type de locations (ENUM : HOME, POINT_OF_INTEREST)
+    Default_price
+    Type(ALWAYS, CUSTOM),
+
+Table Indisponibilité (Unavailability) :
+
+    UnavailabilityID (Clé primaire)
+    VehicleID (Clé étrangère vers la table Véhicule)
+    Date de début
+    Date de fin
+    Heure de début
+    Heure de fin
+    Autres détails pertinents
+
+Table Tarification_Personnalisé (Pricing) :
+
+    PricingID (Clé primaire)
+    VehicleID (Clé étrangère vers la table Véhicule)
+    Date 
+    Prix
+    
+
+Table Réductions (Discounts) : Cette table stocke les réductions applicables pour différentes durées de réservation.
+
+    DiscountID (Clé primaire)
+    vehiculeId (Clé étrangère vers la table Véhicule)
+    Durée de la réservation (ENUM : JOUR, SEMAINE, MOIS)
+    Pourcentage de réduction
+
+
+Modelname
+Pricing
+Availability
+Unavailability
+Discounts
+UserProfile
+Conversation
+Reservation
+Vehicle
+VehicleModel
+VehiculeAnnonce
+
+et par defaut type default et custom date null
+
+Chaque disponibilité est listé dans le calendrier avec la date et l'heure et le type ( défaut ou customisé)
+
+Si je choisis modifier la disponibilité pour toute les WEEKDAY ( comme tous les lundis)   créer des disponibilités customisé si c étaient des défauts sinon je vais mettre tout simplement
+à jour les disponilités customisé correspondants au véhicule ID donné et du WEEDAY ( correpondant à lundi ) à la fin on aura une liste de disponibilités personnalisés pour tous les lundis
+(type custom, custom date null)
+
+Si je choisis pour un jour spécial par exemple c'est uniquement ce jour, donc effectivement meme chose mais ça sera un seul ligne et cette fois ci je préside la date exacte dans le champ
+custom Date
+(type custom; custom date not null)
+
+créer une disponibilité personnalisée
+cas 1:
+{
+	"AvailabilityID":1,
+	"vehiculeId":6,
+	"WeekDAY":2,
+	"fromTime":"10:00",
+	"lastName":"18:30",
+	"type":"1",
+	"CustomDate:"2024-02-29"
+}
+
+
+Mise à jour la disponibilité par défaut pour une journée Donnée params {WeekDAY}
+cas 2
+{
+	"AvailabilityID":1,
+	"vehiculeId":6,
+	"fromTime":"10:00",
+	"lastName":"18:30",
+	"type":"0",
+}
+
+Mise à jour la disponibilité personnalisé pour une journée Donnée params {AvailabilityID}
+{
+	"vehiculeId":6,
+	"WeekDAY":2,
+	"fromTime":"10:00",
+	"lastName":"18:30",
+	"type":"1",
+	"CustomDate:"2024-02-29"
+}
