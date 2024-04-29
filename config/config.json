@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "freedb_fatah",
-    "password": "7PFnk2zVt2UN#X#",
-    "database": "freedb_moovicardbTesting",
-    "host": "sql.freedb.tech",
+    "username": "root",
+    "password": null,
+    "database": "moovicar_db_prod",
+    "host": "127.0.0.1",
     "dialect": "mysql"
   }
 }

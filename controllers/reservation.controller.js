@@ -2,6 +2,7 @@
 
 const db = require("../models/index");
 const { Op, col } = require("sequelize");
+const Sequelize = require("sequelize");
 
 const vehicle = db.Vehicle;
 const VehicleModel = db.VehicleModel;
@@ -35,7 +36,6 @@ exports.getreservations = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
         {
           model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
@@ -48,7 +48,6 @@ exports.getreservations = function (req, res) {
             "country",
             "profile_url",
           ], // Sélectionnez les attributs que vous souhaitez inclure
-          where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
 
         {
@@ -128,7 +127,6 @@ exports.getReservationById = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
         {
           model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
@@ -141,7 +139,6 @@ exports.getReservationById = function (req, res) {
             "country",
             "profile_url",
           ], // Sélectionnez les attributs que vous souhaitez inclure
-          where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
 
         {
@@ -206,7 +203,7 @@ exports.getReservationByDriverHoteId = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
+          // where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
         {
           model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
@@ -219,7 +216,7 @@ exports.getReservationByDriverHoteId = function (req, res) {
             "country",
             "profile_url",
           ], // Sélectionnez les attributs que vous souhaitez inclure
-          where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
+          // where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
 
         {
@@ -284,7 +281,7 @@ exports.getReservationByDriverInviteId = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
+          // where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
         {
           model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
@@ -297,7 +294,7 @@ exports.getReservationByDriverInviteId = function (req, res) {
             "country",
             "profile_url",
           ], // Sélectionnez les attributs que vous souhaitez inclure
-          where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
+          // where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
 
         {
@@ -400,7 +397,7 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") },
+          // where: { id: col("reservation.driverInviteId") },
         },
         {
           model: UserProfile,
@@ -413,7 +410,7 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "country",
             "profile_url",
           ],
-          where: { id: col("reservation.driverHoteId") },
+          // where: { id: col("reservation.driverHoteId") },
         },
         {
           model: VehiculeAnnonce,
@@ -481,7 +478,7 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "immatriculation",
             "profile_url",
           ],
-          where: { id: col("reservation.driverInviteId") },
+          // where: { id: col("reservation.driverInviteId") },
         },
         {
           model: UserProfile,
@@ -494,7 +491,7 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "country",
             "profile_url",
           ],
-          where: { id: col("reservation.driverHoteId") },
+          // where: { id: col("reservation.driverHoteId") },
         },
         {
           model: VehiculeAnnonce,
