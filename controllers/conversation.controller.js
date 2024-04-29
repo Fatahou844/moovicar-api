@@ -53,13 +53,11 @@ exports.getConversations = function (req, res) {
               "country",
               "immatriculation",
             ],
-            where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
             attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
-            where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
           },
         ],
       },
@@ -144,13 +142,11 @@ exports.getConversationByReservationId = function (req, res) {
               "immatriculation",
               "profile_url",
             ],
-            where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
             attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
-            where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
           },
         ],
       },
@@ -219,13 +215,11 @@ exports.getConversationByGroupByReservationId = function (req, res) {
               "country",
               "immatriculation",
             ],
-            where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
             attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
-            where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
           },
         ],
       },
