@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.92e63a7f.css",
-    "main.js": "/static/js/main.c6fc1ee5.js",
+    "main.css": "/static/css/main.fe7ff055.css",
+    "main.js": "/static/js/main.ab83dabd.js",
     "static/media/car (2).png": "/static/media/car (2).24fbfe87e3bb2f615c7a.png",
     "static/media/vehicule.avif": "/static/media/vehicule.e2fd2cc0aad25daa2850.avif",
     "static/media/interiorcar.jpg": "/static/media/interiorcar.1b6f5ac21524d35c0ea1.jpg",
@@ -13,11 +13,11 @@
     "static/media/noimage.webp": "/static/media/noimage.600d7c1e9c3fb5db22c5.webp",
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
-    "main.92e63a7f.css.map": "/static/css/main.92e63a7f.css.map",
-    "main.c6fc1ee5.js.map": "/static/js/main.c6fc1ee5.js.map"
+    "main.fe7ff055.css.map": "/static/css/main.fe7ff055.css.map",
+    "main.ab83dabd.js.map": "/static/js/main.ab83dabd.js.map"
   },
   "entrypoints": [
-    "static/css/main.92e63a7f.css",
-    "static/js/main.c6fc1ee5.js"
+    "static/css/main.fe7ff055.css",
+    "static/js/main.ab83dabd.js"
   ]
 }
