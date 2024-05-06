@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "modeleId",
       });
       models.Vehicle.belongsTo(models.UserProfile, { foreignKey: "userId" });
+
+      models.Vehicle.hasOne(models.VehiculeAnnonce, {
+        foreignKey: "vehiculeAnnonceId",
+      });
     }
   }
   Vehicle.init(
