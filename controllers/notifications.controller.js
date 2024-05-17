@@ -42,6 +42,14 @@ exports.createNotification = async function (req, res) {
     .then((Notification) => {
       console.log(Notification);
       if (Notification) {
+        // Emission de la notification en temps réel
+        // req.io.emit("notification", Notification);
+        const userId = Notification.userId;
+        const userSocketId = req.userConnections[userId];
+
+        if (userSocketId) {
+          req.io.emit("notification", Notification);
+        }
         res.status(200).json(Notification);
       } else {
         res.status(400).json(-1);

@@ -3,6 +3,8 @@ const express = require("express");
 const nocache = require("nocache");
 const session = require("express-session");
 const passport = require("passport");
+const http = require("http");
+const socketIo = require("socket.io");
 const bodyParser = require("body-parser");
 const db = require("./models/index");
 const vehicleRoutes = require("./routes/vehicle.routes");
@@ -21,7 +23,6 @@ const hoteavailabilitiesRoutes = require("./routes/hoteavailabilities.routes");
 const hoteunavailabilitiesRoutes = require("./routes/hoteunaivalabilities.routes");
 const reviewRoutes = require("./routes/reviewvehicle.routes");
 const notificationsRoutes = require("./routes/notifications.routes");
-
 const reservationsRoutes = require("./routes/reservation.routes");
 const conversationsRoutes = require("./routes/conversation.routes");
 const localMiddlewareAuth = require("./middlewares/localMiddleware");
@@ -35,9 +36,18 @@ const cors = require("cors");
 const reservationpreferences = require("./models/reservationpreferences");
 
 const app = express();
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 // Utilisez le middleware body-parser pour traiter le corps des requêtes
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.db = db;
 
 const PORT = process.env.PORT || 3001;
@@ -80,11 +90,52 @@ app.db.sequelize
     console.error("Unable to connect to the database:", err);
   });
 // Active le middleware cors pour toutes les routes
-app.use(cors());
-
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 // Set up passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Objet pour stocker les connexions utilisateur
+const userConnections = {};
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.on("register", (userId) => {
+    userConnections[userId] = socket.id;
+  });
+
+  socket.on("reservation", (reservationId) => {
+    userConnections[reservationId] = socket.reservationId;
+  });
+
+  socket.on("disconnect", () => {
+    for (const [userId, reservationId, socketId] of Object.entries(
+      userConnections
+    )) {
+      if (socketId === socket.id) {
+        delete userConnections[userId];
+        break;
+      }
+
+      if (socketId === socket.id) {
+        delete userConnections[reservationId];
+        break;
+      }
+    }
+    console.log("Client disconnected");
+  });
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  req.userConnections = userConnections;
+  next();
+});
 
 //Definitions des routes
 app.use("/api/vehicles", vehicleRoutes);
@@ -206,10 +257,16 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(PORT, (error) => {
-  if (!error)
-    console.log(
-      "Server is Successfully Running, and App is listening on port " + PORT
-    );
-  else console.log("Error occurred, server can't start", error);
+// app.listen(PORT, (error) => {
+//   if (!error)
+//     console.log(
+//       "Server is Successfully Running, and App is listening on port " + PORT
+//     );
+//   else console.log("Error occurred, server can't start", error);
+// });
+
+// Socket.io pour les notifications en temps réel
+
+server.listen(PORT, () => {
+  console.log("Serveur backend lancé sur le port " + PORT);
 });

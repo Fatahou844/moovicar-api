@@ -82,6 +82,12 @@ exports.createConversation = async function (req, res) {
     .then((reserv) => {
       console.log(reserv);
       if (reserv) {
+        const reservationId = reserv.reservationId;
+        const SocketReservationId = req.userConnections[reservationId];
+
+        if (reservationId) {
+          req.io.emit("conversation", reserv);
+        }
         res.status(200).json(reserv);
       } else {
         res.status(400).json(-1);
