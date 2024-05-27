@@ -46,6 +46,11 @@ module.exports = (sequelize, DataTypes) => {
       OpenID: DataTypes.STRING,
       access_tokenPaypal: DataTypes.STRING,
       app_id: DataTypes.STRING,
+      AcceptanceRate: DataTypes.FLOAT,
+      ResponseRate: DataTypes.FLOAT,
+      EngagementRate: DataTypes.FLOAT,
+      EvaluationNumber: DataTypes.INTEGER,
+      Finalizedtrips: DataTypes.INTEGER,
     },
     {
       sequelize,

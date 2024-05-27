@@ -28,6 +28,8 @@ const conversationsRoutes = require("./routes/conversation.routes");
 const localMiddlewareAuth = require("./middlewares/localMiddleware");
 const googleMiddlewareAuth = require("./middlewares/googleMiddleware");
 
+const startCronJob = require("./services/nodeCronHotePerformances");
+
 const path = require("path");
 
 const userprofile = db.UserProfile;
@@ -269,4 +271,5 @@ app.get("*", (req, res) => {
 
 server.listen(PORT, () => {
   console.log("Serveur backend lancé sur le port " + PORT);
+  startCronJob();
 });

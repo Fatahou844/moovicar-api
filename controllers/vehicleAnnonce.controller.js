@@ -37,6 +37,11 @@ exports.getVehiculeAnnonces = function (req, res) {
               "city",
               "country",
               "immatriculation",
+              "AcceptanceRate",
+              "ResponseRate",
+              "EngagementRate",
+              "EvaluationNumber",
+              "Finalizedtrips",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -124,6 +129,11 @@ exports.getVehiculeAnnonceById = function (req, res) {
               "country",
               "immatriculation",
               "createdAt",
+              "AcceptanceRate",
+              "ResponseRate",
+              "EngagementRate",
+              "EvaluationNumber",
+              "Finalizedtrips",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -188,6 +198,11 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
               "immatriculation",
               "profile_url",
               "createdAt",
+              "AcceptanceRate",
+              "ResponseRate",
+              "EngagementRate",
+              "EvaluationNumber",
+              "Finalizedtrips",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -233,6 +248,24 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
           "userId",
           "kilometrage",
         ], // Sélectionnez les attributs que vous souhaitez inclure
+        include: [
+          {
+            model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "immatriculation",
+              "AcceptanceRate",
+              "ResponseRate",
+              "EngagementRate",
+              "EvaluationNumber",
+              "Finalizedtrips",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
+          },
+        ],
       },
     ],
     where: literal(
