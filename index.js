@@ -267,6 +267,9 @@ app.get("*", (req, res) => {
 //   else console.log("Error occurred, server can't start", error);
 // });
 
+// Importer et exécuter le cron job
+require("./services/nodeCronJobsCancelledCondititions");
+
 // Socket.io pour les notifications en temps réel
 
 server.listen(PORT, () => {
