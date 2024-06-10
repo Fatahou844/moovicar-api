@@ -1,21 +1,21 @@
 {
   "development": {
     "username": "freedb_fatah",
-    "password": "7PFnk2zVt2UN#X#",
+    "password": "mB@9eYvbY6sN%tz",
     "database": "freedb_moovicardbTesting",
     "host": "sql.freedb.tech",
     "dialect": "mysql"
   },
   "test": {
     "username": "freedb_fatah",
-    "password": "7PFnk2zVt2UN#X#",
+    "password": "mB@9eYvbY6sN%tz",
     "database": "freedb_moovicardbTesting",
     "host": "sql.freedb.tech",
     "dialect": "mysql"
   },
   "production": {
   "username": "freedb_fatah",
-    "password": "7PFnk2zVt2UN#X#",
+    "password": "mB@9eYvbY6sN%tz",
     "database": "freedb_moovicardbTesting",
     "host": "sql.freedb.tech",
     "dialect": "mysql"
