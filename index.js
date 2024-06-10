@@ -25,6 +25,7 @@ const reviewRoutes = require("./routes/reviewvehicle.routes");
 const notificationsRoutes = require("./routes/notifications.routes");
 const reservationsRoutes = require("./routes/reservation.routes");
 const conversationsRoutes = require("./routes/conversation.routes");
+const reservationsGainRoutes = require("./routes/reservationGain.routes");
 const localMiddlewareAuth = require("./middlewares/localMiddleware");
 const googleMiddlewareAuth = require("./middlewares/googleMiddleware");
 
@@ -158,6 +159,7 @@ app.use("/api/hoteavailabilities", hoteavailabilitiesRoutes);
 app.use("/api/hoteunavailabilities", hoteunavailabilitiesRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/reservationsGain", reservationsGainRoutes);
 
 app.use("/api", localMiddlewareAuth);
 app.use("/api/auth/google", googleMiddlewareAuth);
