@@ -6,6 +6,7 @@ const Reservation = db.Reservation;
 const Vehicle = db.Vehicle;
 const Unavailability = db.Unavailability;
 const UserProfile = db.UserProfile;
+const ReservationGains = db.ReservationGains;
 
 const checkAndAutoCancelReservations = async () => {
   try {
@@ -126,6 +127,35 @@ const checkAndAutoCancelReservations = async () => {
     for (let res of waitingReservations) {
       res.status = "2"; // Statut "Annulé"
       await res.save();
+    }
+
+    // Nouvelle Condition: Passer les réservations payées (statut "3") en statut "4" (Complété) si la date de fin est terminée et qu'elles ne sont pas annulées.
+    const reservationsToComplete = await Reservation.findAll({
+      where: {
+        status: "3", // Statut "Payé"
+        endDate: {
+          [Op.lte]: now,
+        },
+      },
+    });
+
+    for (let res of reservationsToComplete) {
+      res.status = "4"; // Statut "Complété"
+      await res.save();
+
+      // Nouvelle Condition: Passer les réservations gains en attente (statut "0") en statut "3" (gagné) si la date de fin est terminée et qu'elles ne sont pas annulées.
+
+      const reservationsGainToComplete = await ReservationGains.findAll({
+        where: {
+          type: "0", // Statut "en attente"
+          reservationId: res.reservationId,
+        },
+      });
+
+      for (let res of reservationsGainToComplete) {
+        res.type = "3"; // Statut "Annulé"
+        await res.save();
+      }
     }
   } catch (error) {
     console.error(
