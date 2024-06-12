@@ -45,6 +45,7 @@ const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
+    credentials: true, // Permet l'envoi de cookies
   },
 });
 // Utilisez le middleware body-parser pour traiter le corps des requêtes
@@ -64,9 +65,13 @@ const endpointSecret =
 app.use(
   session({
     secret: "xR7Fb2#z!5G8LmN@e6T9p$WqK3vHsYcU4jXo&1",
-    resave: true,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Assurez-vous que secure est défini sur false pour le développement en local
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false, // Assurez-vous que c'est `true` si vous utilisez HTTPS
+      sameSite: "none", // Permet de partager les cookies entre différents domaines
+    },
   })
 );
 
