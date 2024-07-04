@@ -29,6 +29,7 @@ exports.getVehiculeAnnonces = function (req, res) {
           "principalPhotos",
           "lateralPhotos",
           "interiorPhotos",
+          "IsUtilitaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -124,6 +125,7 @@ exports.getVehiculeAnnonceById = function (req, res) {
           "Assurance",
           "ControleTechnique",
           "AutorizationProprietaire",
+          "IsUtilitaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -196,6 +198,7 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
           "Assurance",
           "ControleTechnique",
           "AutorizationProprietaire",
+          "IsUtilitaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -262,6 +265,7 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
           "modeleId",
           "userId",
           "kilometrage",
+          "IsUtilitaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {

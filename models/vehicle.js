@@ -57,6 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       Assurance: DataTypes.BOOLEAN,
       ControleTechnique: DataTypes.BOOLEAN,
       AutorizationProprietaire: DataTypes.BOOLEAN,
+      IsUtilitaire: DataTypes.BOOLEAN,
     },
     {
       sequelize,
