@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/static/css/main.612909b2.css",
-    "main.js": "/static/js/main.78b8e189.js",
+    "main.js": "/static/js/main.e4b88653.js",
     "static/media/car (2).png": "/static/media/car (2).24fbfe87e3bb2f615c7a.png",
+    "static/media/home.png": "/static/media/home.f125737f7fcb1059e6c2.png",
     "static/media/vehicule.avif": "/static/media/vehicule.e2fd2cc0aad25daa2850.avif",
-    "static/media/homei.png": "/static/media/homei.ddeca498176968774575.png",
+    "static/media/logoMoovicar.png": "/static/media/logoMoovicar.c83d84e52890cf872122.png",
     "static/media/interiorcar.jpg": "/static/media/interiorcar.1b6f5ac21524d35c0ea1.jpg",
-    "static/media/moovicarLogo.png": "/static/media/moovicarLogo.5a4dbd89ff6f05c43fb5.png",
     "static/media/avantcar.jpg": "/static/media/avantcar.e06d92110ffa97ee8d8d.jpg",
     "static/media/lateral.jpg": "/static/media/lateral.eb3198edb8e4c50c4e17.jpg",
     "static/media/user.png": "/static/media/user.a6143582309785dca610.png",
@@ -14,10 +14,10 @@
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
     "main.612909b2.css.map": "/static/css/main.612909b2.css.map",
-    "main.78b8e189.js.map": "/static/js/main.78b8e189.js.map"
+    "main.e4b88653.js.map": "/static/js/main.e4b88653.js.map"
   },
   "entrypoints": [
     "static/css/main.612909b2.css",
-    "static/js/main.78b8e189.js"
+    "static/js/main.e4b88653.js"
   ]
 }
