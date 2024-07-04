@@ -9,17 +9,19 @@
 
   },
   "test": {
-    "username": "freedb_fatah",
-    "password": "mB@9eYvbY6sN%tz",
-    "database": "freedb_moovicardbTesting",
-    "host": "sql.freedb.tech",
-    "dialect": "mysql"
+    "username": "avnadmin",
+    "password": "AVNS_BBJgLx89Xr2938Kteqg",
+    "database": "defaultdb",
+    "host": "mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com",
+    "dialect": "mysql",
+    "port": 15588
   },
   "production": {
-  "username": "freedb_fatah",
-    "password": "mB@9eYvbY6sN%tz",
-    "database": "freedb_moovicardbTesting",
-    "host": "sql.freedb.tech",
-    "dialect": "mysql"
+ "username": "avnadmin",
+    "password": "AVNS_BBJgLx89Xr2938Kteqg",
+    "database": "defaultdb",
+    "host": "mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com",
+    "dialect": "mysql",
+    "port": 15588
   }
 }
