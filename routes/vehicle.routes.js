@@ -8,6 +8,7 @@ const {
   updatevehicle,
   getvehicleByUserId,
   deleteVehicleById,
+  updateVehicleById,
 } = require("../controllers/vehicle.controller");
 
 router.post("/", createvehicle);

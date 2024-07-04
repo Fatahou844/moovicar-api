@@ -53,6 +53,10 @@ module.exports = (sequelize, DataTypes) => {
         "2011",
         "2010"
       ),
+      CertificatImmatriculation: DataTypes.BOOLEAN,
+      Assurance: DataTypes.BOOLEAN,
+      ControleTechnique: DataTypes.BOOLEAN,
+      AutorizationProprietaire: DataTypes.BOOLEAN,
     },
     {
       sequelize,

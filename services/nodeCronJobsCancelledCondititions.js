@@ -7,6 +7,8 @@ const Vehicle = db.Vehicle;
 const Unavailability = db.Unavailability;
 const UserProfile = db.UserProfile;
 const ReservationGains = db.ReservationGains;
+const Paiements = db.Paiements;
+const logger = require("../logger");
 
 const checkAndAutoCancelReservations = async () => {
   try {
@@ -152,13 +154,27 @@ const checkAndAutoCancelReservations = async () => {
         },
       });
 
-      for (let res of reservationsGainToComplete) {
-        res.type = "3"; // Statut "Annulé"
-        await res.save();
+      for (let resGain of reservationsGainToComplete) {
+        resGain.type = "3"; // Statut "Annulé"
+        await resGain.save();
+
+        // Initier un paiement pour la réservation
+        try {
+          const newPayment = await Paiements.create({
+            reservationId: res.reservationId,
+            amount: resGain.amount * 0.8,
+            userId: res.driverHoteId,
+            paiementStatus: "0",
+            notes: "Gain gagné",
+          });
+          logger.info("Nouveau paiement ajouté:", newPayment);
+        } catch (error) {
+          logger.error("Erreur lors de l'ajout du paiement:", error);
+        }
       }
     }
   } catch (error) {
-    console.error(
+    logger.error(
       "Erreur lors de l'annulation automatique des réservations:",
       error
     );

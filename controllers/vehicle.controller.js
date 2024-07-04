@@ -25,6 +25,8 @@ exports.getvehicles = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "AcceptanceRate",
+            "EvaluationNumber",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
@@ -81,6 +83,8 @@ exports.getvehicleById = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "AcceptanceRate",
+            "EvaluationNumber",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
@@ -156,6 +160,8 @@ exports.getvehicleByUserId = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "AcceptanceRate",
+            "EvaluationNumber",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
@@ -192,6 +198,32 @@ exports.deleteVehicleById = function (req, res) {
       } else {
         res.status(404).json({ error: "Vehicle not found" });
       }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
+
+exports.updateVehicleById = function (req, res) {
+  const vehicle_id = req.params.id;
+  const updatedData = req.body; // Les données de mise à jour sont envoyées dans le corps de la requête
+
+  vehicle
+    .findOne({
+      where: {
+        id: vehicle_id,
+      },
+    })
+    .then((vehicle) => {
+      if (vehicle) {
+        return vehicle.update(updatedData);
+      } else {
+        res.status(404).json({ error: "Vehicle not found" });
+      }
+    })
+    .then((updatedVehicle) => {
+      res.status(200).json(updatedVehicle);
     })
     .catch((error) => {
       console.error(error);

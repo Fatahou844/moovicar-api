@@ -8,6 +8,8 @@ const socketIo = require("socket.io");
 const bodyParser = require("body-parser");
 const db = require("./models/index");
 const vehicleRoutes = require("./routes/vehicle.routes");
+const users = require("./routes/userprofiles.routes");
+const cookieParser = require("cookie-parser");
 const vehicleModelRoutes = require("./routes/vehicleModel.routes");
 const vehicleOptionsRoutes = require("./routes/vehicleOption.routes");
 const vehicleOptionRecordsRoutes = require("./routes/vehicleOptionRecord.routes");
@@ -17,6 +19,8 @@ const availabilityRoutes = require("./routes/availability.routes");
 const unavailabilityRoutes = require("./routes/unavailability.routes");
 const pricingsRoutes = require("./routes/pricing.routes");
 const discountRoutes = require("./routes/discount.routes");
+const paiementsRoutes = require("./routes/paiements.routes");
+const logger = require("./logger");
 const deliverylocationRoutes = require("./routes/deliverylocation.routes");
 const reservationcarspreferencesRoutes = require("./routes/reservationcarspreferences.routes");
 const hoteavailabilitiesRoutes = require("./routes/hoteavailabilities.routes");
@@ -28,15 +32,14 @@ const conversationsRoutes = require("./routes/conversation.routes");
 const reservationsGainRoutes = require("./routes/reservationGain.routes");
 const localMiddlewareAuth = require("./middlewares/localMiddleware");
 const googleMiddlewareAuth = require("./middlewares/googleMiddleware");
-
+const stripeMiddleware = require("./middlewares/stripeMiddleware.js");
 const startCronJob = require("./services/nodeCronHotePerformances");
-
 const path = require("path");
 
 const userprofile = db.UserProfile;
+const MoovicarUsers = db.MoovicarUsers;
 
 const cors = require("cors");
-const reservationpreferences = require("./models/reservationpreferences");
 
 const app = express();
 
@@ -51,20 +54,21 @@ const io = socketIo(server, {
 // Utilisez le middleware body-parser pour traiter le corps des requêtes
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
 
 app.db = db;
-
 const PORT = process.env.PORT || 3001;
-
 const stripe = require("stripe")(
   "sk_test_51NkmmiEcnL0rILcw6efLdctPVKtl7LIyweqzpfXJvwZQpcLU1E1IPlXNvtz5IETOoob7Wm0YHGxk6bmHZZOkpu5G00V1LDfuua"
 );
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret =
   "whsec_fe3b1cc259b5bb1fed0bc747ef1cceefa7b0f2e7d523260e87e327bd9ebcb27e";
+
 app.use(
   session({
-    secret: "xR7Fb2#z!5G8LmN@e6T9p$WqK3vHsYcU4jXo&1",
+    secret: process.env.SECRET_SESSION_JWT,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -75,16 +79,51 @@ app.use(
   })
 );
 
+app.use((err, req, res, next) => {
+  logger.info(err.stack);
+  res.status(500).json({ message: "Internal Server Error" });
+});
+
 // Utilisation du middleware nocache pour désactiver le cache HTTP
 app.use(nocache());
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
-  userprofile.findByPk(id).then((user) => {
-    done(null, user);
-  });
+passport.deserializeUser(async (id, done) => {
+  try {
+    let user = null;
+
+    // Utilisez l'ID pour récupérer l'utilisateur de la table userprofile
+    const userDataUserProfile = await userprofile.findByPk(id);
+
+    if (userDataUserProfile) {
+      // L'utilisateur est un utilisateur de l'application
+      user = {
+        ...userDataUserProfile.toJSON(),
+        userRole: "user",
+      };
+      done(null, user);
+    } else {
+      // Essayez de récupérer l'utilisateur depuis la table VeritatrustUsers
+      const userDataMoovicarUsers = await MoovicarUsers.findByPk(id);
+
+      if (userDataMoovicarUsers) {
+        // L'utilisateur est un membre de l'équipe de support
+        user = {
+          ...userDataMoovicarUsers.toJSON(),
+          userRole: "admin",
+        };
+        done(null, user);
+      } else {
+        logger.info(`Aucun utilisateur trouvé avec l'ID ${id}`);
+        done(null, false); // Signale que l'utilisateur n'a pas été trouvé
+      }
+    }
+  } catch (err) {
+    logger.info(err);
+    done(err);
+  }
 });
 
 app.db.sequelize
@@ -92,10 +131,10 @@ app.db.sequelize
     logging: false,
   })
   .then(() => {
-    console.log("Connected to the database");
+    logger.info("Connected to the database");
   })
   .catch((err) => {
-    console.error("Unable to connect to the database:", err);
+    logger.info("Unable to connect to the database:", err);
   });
 // Active le middleware cors pour toutes les routes
 app.use(
@@ -111,7 +150,7 @@ app.use(passport.session());
 const userConnections = {};
 
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  logger.info("New client connected");
 
   socket.on("register", (userId) => {
     userConnections[userId] = socket.id;
@@ -135,7 +174,7 @@ io.on("connection", (socket) => {
         break;
       }
     }
-    console.log("Client disconnected");
+    logger.info("Client disconnected");
   });
 });
 
@@ -147,6 +186,7 @@ app.use((req, res, next) => {
 
 //Definitions des routes
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/users", users);
 app.use("/api/vehicleModels", vehicleModelRoutes);
 app.use("/api/vehicleOptions", vehicleOptionsRoutes);
 app.use("/api/vehicleOptionRecords", vehicleOptionRecordsRoutes);
@@ -165,9 +205,10 @@ app.use("/api/hoteunavailabilities", hoteunavailabilitiesRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/reservationsGain", reservationsGainRoutes);
-
+app.use("/api/paiements", paiementsRoutes);
 app.use("/api", localMiddlewareAuth);
 app.use("/api/auth/google", googleMiddlewareAuth);
+app.use("/api/stripe", stripeMiddleware);
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -235,12 +276,12 @@ app.post(
       case "payment_intent.succeeded":
         const paymentIntentSucceeded = event.data.object;
         // Then define and call a function to handle the event payment_intent.succeeded
-        console.log("Paiement réussi :", paymentIntent);
+        logger.info("Paiement réussi :", paymentIntent);
         response.status(200).json({ message: "Paiement réussi." });
         break;
       // ... handle other event types
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        logger.info(`Unhandled event type ${event.type}`);
     }
 
     // Return a 200 response to acknowledge receipt of the event
@@ -266,20 +307,12 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// app.listen(PORT, (error) => {
-//   if (!error)
-//     console.log(
-//       "Server is Successfully Running, and App is listening on port " + PORT
-//     );
-//   else console.log("Error occurred, server can't start", error);
-// });
-
 // Importer et exécuter le cron job
 require("./services/nodeCronJobsCancelledCondititions");
 
 // Socket.io pour les notifications en temps réel
 
 server.listen(PORT, () => {
-  console.log("Serveur backend lancé sur le port " + PORT);
+  logger.info("Serveur backend lancé sur le port " + PORT);
   startCronJob();
 });

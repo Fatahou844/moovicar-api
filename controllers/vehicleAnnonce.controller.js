@@ -22,6 +22,13 @@ exports.getVehiculeAnnonces = function (req, res) {
           "modeleId",
           "userId",
           "kilometrage",
+          "CertificatImmatriculation",
+          "Assurance",
+          "ControleTechnique",
+          "AutorizationProprietaire",
+          "principalPhotos",
+          "lateralPhotos",
+          "interiorPhotos",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -113,6 +120,10 @@ exports.getVehiculeAnnonceById = function (req, res) {
           "porteNumber",
           "siegeNumber",
           "createdAt",
+          "CertificatImmatriculation",
+          "Assurance",
+          "ControleTechnique",
+          "AutorizationProprietaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -181,6 +192,10 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
           "porteNumber",
           "siegeNumber",
           "createdAt",
+          "CertificatImmatriculation",
+          "Assurance",
+          "ControleTechnique",
+          "AutorizationProprietaire",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -265,6 +280,10 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
               "Finalizedtrips",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
+          {
+            model: VehicleModel, // Remplacez VehicleModel par le nom de votre modèle de véhicule
+            attributes: ["id", "marque", "modele"], // Sélectionnez les attributs du modèle de véhicule
+          },
         ],
       },
     ],
@@ -275,6 +294,33 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
     .then((result) => {
       console.log(result);
       res.status(200).json(result);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};
+
+exports.updateVehiculeAnnonce = function (req, res) {
+  const vehiculeAnnonceId = req.params.id; // Supposons que l'identifiant est passé comme paramètre URL
+  const updatedData = req.body; // Les nouvelles données de l'annonce
+
+  VehiculeAnnonce.findOne({
+    where: {
+      vehiculeAnnonceId: vehiculeAnnonceId,
+    },
+  })
+    .then((vehiculeAnnonce) => {
+      if (vehiculeAnnonce) {
+        return vehiculeAnnonce.update(updatedData);
+      } else {
+        res.status(404).json({ error: "VehiculeAnnonce not found" });
+      }
+    })
+    .then((updatedAnnonce) => {
+      if (updatedAnnonce) {
+        res.status(200).json(updatedAnnonce);
+      }
     })
     .catch((error) => {
       console.error(error);

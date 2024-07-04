@@ -9,14 +9,19 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("Availabilities", "CustomDate", {
-      type: Sequelize.DATEONLY,
-      allowNull: true, // ou false, selon vos besoins
-    });
-    await queryInterface.addColumn("Availabilities", "DateCustomised", {
-      type: Sequelize.DATEONLY,
-      allowNull: true, // ou false, selon vos besoins
-    });
+    try {
+      await queryInterface.addColumn("Availabilities", "CustomDate", {
+        type: Sequelize.DATEONLY,
+        allowNull: true, // ou false, selon vos besoins
+      });
+      await queryInterface.addColumn("Availabilities", "DateCustomised", {
+        type: Sequelize.DATEONLY,
+        allowNull: true, // ou false, selon vos besoins
+      });
+    } catch (error) {
+      console.error("Error adding column CustomDate:", error.message);
+      // Continue with the next migration
+    }
   },
 
   async down(queryInterface, Sequelize) {
