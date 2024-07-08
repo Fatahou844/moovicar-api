@@ -48,6 +48,7 @@ const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
+    secure: false,
     credentials: true, // Permet l'envoi de cookies
   },
 });
