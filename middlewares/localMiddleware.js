@@ -351,6 +351,42 @@ router.post(
   }
 );
 
+router.get("/admin", (req, res) => {
+  if (req.isAuthenticated()) {
+    // Query the database to retrieve user data
+    MoovicarUsers.findOne({
+      where: { email: req.user.email },
+    })
+      .then((user) => {
+        if (!user) {
+          res.send(null);
+        }
+
+        const userdata = {
+          email: user.email,
+          first_name: user.firstName,
+          id: user.id,
+          last_name: user.lastName,
+          role: "administrator",
+        };
+        res.send(userdata || null);
+      })
+      .catch((err) => {
+        res.send(null);
+      });
+  } else {
+    res.send(null);
+  }
+});
+
+router.get("/admin/auth/check-auth", (req, res) => {
+  if (req.isAuthenticated() && req.user.userRole === "admin") {
+    res.json({ isAuthenticated: true });
+  } else {
+    res.json({ isAuthenticated: false });
+  }
+});
+
 router.get("/logout", (req, res) => {
   res.clearCookie("connect.sid"); // This logs out the user.
 
