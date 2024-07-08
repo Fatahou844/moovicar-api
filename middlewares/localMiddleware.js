@@ -230,6 +230,8 @@ router.get("/", (req, res) => {
           res.send(null);
         }
 
+        req.user.role = "user";
+
         res.send(req.user || null);
       })
       .catch((err) => {
