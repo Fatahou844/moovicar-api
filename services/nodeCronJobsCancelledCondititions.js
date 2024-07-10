@@ -155,7 +155,7 @@ const checkAndAutoCancelReservations = async () => {
       });
 
       for (let resGain of reservationsGainToComplete) {
-        resGain.type = "3"; // Statut "Annulé"
+        resGain.type = "3"; // Statut "gagné"
         await resGain.save();
 
         // Initier un paiement pour la réservation

@@ -13,6 +13,7 @@ const logger = require("../logger");
 const express = require("express");
 const dotenv = require("dotenv");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { getPaiementsByUser } = require("../controllers/paiements.controller");
 
 dotenv.config();
 
@@ -394,5 +395,11 @@ router.get("/logout", (req, res) => {
 
   res.redirect("/");
 });
+
+router.get(
+  "/paiements/:userId",
+  passport.authenticate("userprofile", { session: false }),
+  getPaiementsByUser
+);
 
 module.exports = router;

@@ -127,3 +127,93 @@ exports.updatePaiement = function (req, res) {
       res.status(500).json({ error: "Internal server error" });
     });
 };
+
+exports.getPaiementsByUser = function (req, res) {
+  Paiements.findAll({
+    include: [
+      {
+        model: reservation,
+        attributes: [
+          "reservationId",
+          "vehiculeId",
+          "status",
+          "PaymentIntentId",
+        ],
+        include: [
+          {
+            model: vehicle, // Remplacez Vehicule par le nom de votre modèle de véhicule
+            attributes: ["id", "description", "images", "principalPhotos"],
+            include: [
+              {
+                model: VehicleModel, // Remplacez Vehicule par le nom de votre modèle de véhicule
+                attributes: ["id", "marque", "modele"], // Sélectionnez les attributs que vous souhaitez inclure
+              },
+            ], // Sélectionnez les attributs que vous souhaitez inclure
+          },
+          {
+            model: UserProfile,
+            as: "Host", // Remplacez Vehicule par le nom de votre modèle de véhicu
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "immatriculation",
+              "profile_url",
+              "email",
+              "stripeAccountId",
+              "last4",
+            ],
+          },
+          {
+            model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
+            as: "Invite",
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "profile_url",
+              "email",
+              "stripeAccountId",
+              "last4",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
+          },
+
+          {
+            model: VehiculeAnnonce, // Remplacez Vehicule par le nom de votre modèle de véhicule
+            attributes: [
+              "vehiculeAnnonceId",
+              "reservationPrice",
+              "locationMode",
+              "vehiculeType",
+              "vehiculeId",
+              "minDistanceInclus",
+              "distanceOutMin",
+              "locationAddress",
+              "locationCoordinates",
+              "status",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
+          },
+        ],
+      },
+    ],
+    where: {
+      userId: req.params.userId,
+    },
+  })
+    .then((demandes) => {
+      console.log(demandes);
+      if (demandes) {
+        res.status(200).json(demandes);
+      } else {
+        res.status(400).json(-1);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "vehicles Internal server error" });
+    });
+};
