@@ -396,6 +396,59 @@ router.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
+router.post("/create-connected-account", async (req, res) => {
+  const { email, account_holder_name, account_holder_type, iban } = req.body;
+
+  try {
+    // Créer un compte connecté
+    const account = await stripe.accounts.create({
+      type: "custom",
+      country: "DE", // Le pays du compte bancaire
+      email: email,
+      business_type: "individual", // ou 'company' selon le cas
+      individual: {
+        first_name: account_holder_name.split(" ")[0],
+        last_name: account_holder_name.split(" ")[1],
+        email: email,
+      },
+      business_profile: {
+        mcc: "5734", // Code MCC, ajustez selon votre besoin
+        product_description: "Custom Transfers",
+      },
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    if (!account || !account.id) {
+      throw new Error("Failed to create a connected account.");
+    }
+
+    // Ajouter un compte bancaire au compte connecté
+    const bankAccount = await stripe.accounts.createExternalAccount(
+      "acct_1032D82eZvKYlo2C",
+      {
+        external_account: "btok_1NAiJy2eZvKYlo2Cnh6bIs9c",
+      }
+    );
+
+    if (!bankAccount || !bankAccount.id) {
+      throw new Error(
+        "Failed to add the bank account to the connected account."
+      );
+    }
+
+    res.json({
+      success: true,
+      accountId: account.id,
+      bankAccountId: bankAccount.id,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get(
   "/paiements/:userId",
   passport.authenticate("userprofile", { session: false }),
