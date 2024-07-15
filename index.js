@@ -75,7 +75,6 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
-      sameSite: "none", // Permet de partager les cookies entre différents domaines
     },
   })
 );
