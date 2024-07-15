@@ -74,7 +74,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: false, // Assurez-vous que c'est `true` si vous utilisez HTTPS
+      secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
       sameSite: "none", // Permet de partager les cookies entre différents domaines
     },
   })
