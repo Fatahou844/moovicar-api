@@ -69,14 +69,12 @@ const endpointSecret =
 
 app.use(
   session({
-    secret: "O0w1RBL9khvpL2PJUPkAGmKznvepaDWO",
+    secret: process.env.SECRET_SESSION_JWT,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "None",
-      secure: true, // Cookie sécurisé uniquement en HTTPS
-      httpOnly: true, // Cookie accessible uniquement par le serveur
-      maxAge: 24 * 60 * 60 * 1000, // Durée de vie du cookie (1 jour, par exemple)
+      httpOnly: true,
+      secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
     },
   })
 );
