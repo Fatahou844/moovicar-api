@@ -46,7 +46,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: "https://moovicar-9c0b59206766.herokuapp.com",
     methods: ["GET", "POST"],
     secure: true,
     credentials: true, // Permet l'envoi de cookies
@@ -71,8 +71,8 @@ const endpointSecret =
 app.use(
   session({
     secret: "RETFFFXDSERGp38uY8EZlKEoGLWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
       secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
