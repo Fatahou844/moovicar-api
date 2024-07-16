@@ -301,6 +301,34 @@ app.post("/api/refund-payment", async (req, res) => {
   });
 });
 
+app.get("/api/autocomplete", async (req, res) => {
+  const { input } = req.query;
+  const apiKey = "AIzaSyCohDl0FgnpiYEtbTE1EURv4WYEaM_Xtow";
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&types=train_station|airport&key=${apiKey}&language=fr&components=country:fr`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/api/details", async (req, res) => {
+  const { place_id } = req.query;
+  const apiKey = "AIzaSyCohDl0FgnpiYEtbTE1EURv4WYEaM_Xtow";
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${apiKey}`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.get("*", (req, res) => {
   req.lang = req.params.lang;
   res.sendFile(path.join(__dirname, "public", "index.html"));
