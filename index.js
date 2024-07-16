@@ -46,7 +46,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://moovicar-9c0b59206766.herokuapp.com",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     secure: true,
     credentials: true, // Permet l'envoi de cookies
@@ -137,7 +137,7 @@ app.db.sequelize
 // Active le middleware cors pour toutes les routes
 app.use(
   cors({
-    origin: "https://moovicar-9c0b59206766.herokuapp.com",
+    origin: "*",
     credentials: true,
   })
 );
