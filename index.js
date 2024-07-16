@@ -48,7 +48,7 @@ const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
-    secure: false,
+    secure: true,
     credentials: true, // Permet l'envoi de cookies
   },
 });
@@ -67,14 +67,16 @@ const stripe = require("stripe")(
 const endpointSecret =
   "whsec_fe3b1cc259b5bb1fed0bc747ef1cceefa7b0f2e7d523260e87e327bd9ebcb27e";
 
+// Configuration de la session avec attributs SameSite et Secure
 app.use(
   session({
-    secret: process.env.SECRET_SESSION_JWT,
+    secret: "RETFFFXDSERGp38uY8EZlKEoGLWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
+      sameSite: "None", // Ajoutez cet attribut pour permettre les cookies tiers
     },
   })
 );
@@ -139,7 +141,8 @@ app.db.sequelize
 // Active le middleware cors pour toutes les routes
 app.use(
   cors({
-    origin: "*",
+    origin: "https://moovicar-9c0b59206766.herokuapp.com",
+    credentials: true,
   })
 );
 // Set up passport
