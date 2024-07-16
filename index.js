@@ -47,7 +47,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "https://moovicar-9c0b59206766.herokuapp.com",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     secure: true,
     credentials: true, // Permet l'envoi de cookies
   },
@@ -68,16 +68,12 @@ const endpointSecret =
   "whsec_fe3b1cc259b5bb1fed0bc747ef1cceefa7b0f2e7d523260e87e327bd9ebcb27e";
 
 // Configuration de la session avec attributs SameSite et Secure
+
 app.use(
   session({
     secret: "RETFFFXDSERGp38uY8EZlKEoGLWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      httpOnly: true,
-      secure: true, // Assurez-vous que c'est `true` si vous utilisez HTTPS
-      sameSite: "None", // Ajoutez cet attribut pour permettre les cookies tiers
-    },
+    resave: false,
+    saveUninitialized: false,
   })
 );
 
@@ -87,7 +83,7 @@ app.use((err, req, res, next) => {
 });
 
 // Utilisation du middleware nocache pour désactiver le cache HTTP
-app.use(nocache());
+// app.use(nocache());
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });

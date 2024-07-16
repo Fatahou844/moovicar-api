@@ -162,7 +162,7 @@ router.post("/support-login", function (req, res, next) {
       }
       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
       res.cookie("jwtToken", token);
-      return res.status(200).json({ success: true }); // Connexion réussie
+      return res.status(200).json({ success: true, jwtToken: token }); // Connexion réussie
     });
   })(req, res, next);
 });
