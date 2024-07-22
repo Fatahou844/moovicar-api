@@ -9,6 +9,7 @@ const VehicleModel = db.VehicleModel;
 const UserProfile = db.UserProfile;
 const reservation = db.Reservation;
 const VehiculeAnnonce = db.VehiculeAnnonce;
+const ReservationGains = db.ReservationGains;
 
 exports.getreservations = function (req, res) {
   reservation
@@ -88,6 +89,7 @@ exports.createreservation = async function (req, res) {
       console.log(reserv);
       if (reserv) {
         res.status(200).json(reserv);
+        // add reservation gain init
       } else {
         res.status(400).json(-1);
       }

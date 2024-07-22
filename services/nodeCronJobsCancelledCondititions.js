@@ -162,7 +162,7 @@ const checkAndAutoCancelReservations = async () => {
         try {
           const newPayment = await Paiements.create({
             reservationId: res.reservationId,
-            amount: resGain.amount * 0.8,
+            amount: resGain.amount * 0.95,
             userId: res.driverHoteId,
             paiementStatus: "0",
             notes: "Gain gagné",

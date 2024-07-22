@@ -341,5 +341,5 @@ require("./services/nodeCronJobsCancelledCondititions");
 
 server.listen(PORT, () => {
   logger.info("Serveur backend lancé sur le port " + PORT);
-  startCronJob();
+  // startCronJob();
 });

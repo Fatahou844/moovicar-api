@@ -16459,3 +16459,27 @@
   label: 'winston veritatrust format',
   timestamp: 'Jul-18-2024 15:20:48'
 }
+{
+  message: 'Serveur backend lancé sur le port 3001',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jul-22-2024 10:27:02'
+}
+{
+  message: 'Connected to the database',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jul-22-2024 10:27:04'
+}
+{
+  message: 'Serveur backend lancé sur le port 3001',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jul-22-2024 10:32:48'
+}
+{
+  message: 'Connected to the database',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jul-22-2024 10:32:49'
+}
