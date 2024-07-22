@@ -260,3 +260,65 @@ exports.updateReservationGains = async function (req, res) {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+exports.getReservationGainsByHostId = function (req, res) {
+  const hostId = req.params.hostId;
+
+  ReservationGains.findAll({
+    include: [
+      {
+        model: reservation,
+        attributes: [
+          "reservationId",
+          "status",
+          "driverInviteId",
+          "driverHoteId",
+        ],
+        required: true, // Utilisation d'une jointure interne
+        include: [
+          {
+            model: vehicle,
+            attributes: ["id", "description", "images"],
+            include: [
+              {
+                model: VehicleModel,
+                attributes: ["id", "marque", "modele"],
+              },
+            ],
+          },
+          {
+            model: UserProfile,
+            as: "Host",
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "immatriculation",
+            ],
+            where: {
+              id: hostId,
+            },
+          },
+          {
+            model: UserProfile,
+            as: "Invite",
+            attributes: ["id", "firstName", "lastName", "city", "country"],
+          },
+        ],
+      },
+    ],
+  })
+    .then((demande) => {
+      if (demande && demande.length > 0) {
+        res.status(200).json(demande);
+      } else {
+        res.status(201).json([]);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+};

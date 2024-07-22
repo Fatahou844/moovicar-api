@@ -179,6 +179,28 @@ const checkAndAutoCancelReservations = async () => {
       error
     );
   }
+
+  const reservationsCancelled = await Reservation.findAll({
+    where: {
+      status: "2", // Statut "Payé"
+    },
+  });
+
+  for (let res of reservationsCancelled) {
+    const reservationsGainCancelled = await ReservationGains.findAll({
+      where: {
+        type: "0", // Statut "en attente"
+        reservationId: res.reservationId,
+      },
+    });
+
+    for (let resGain of reservationsGainCancelled) {
+      resGain.type = "2"; // Statut "manqué"
+      await resGain.save();
+
+      // Initier un paiement pour la réservation
+    }
+  }
 };
 
 // Planifier le cron job pour qu'il s'exécute toutes les minutes

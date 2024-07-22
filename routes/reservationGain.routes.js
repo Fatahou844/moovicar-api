@@ -5,9 +5,15 @@ const {
   getReservationGainsByGroupByReservationId,
   createReservationGains,
   updateReservationGains,
+  getReservationGainsByHostId,
 } = require("../controllers/reservationGain.controller");
 
-router.get("/:reservationId", getReservationGainsByGroupByReservationId);
+router.get(
+  "/reservation/:reservationId",
+  getReservationGainsByGroupByReservationId
+);
+router.get("/host/:hostId", getReservationGainsByHostId);
+
 router.put("/:reservationId", updateReservationGains);
 
 router.post("/", createReservationGains);
