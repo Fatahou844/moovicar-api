@@ -64,7 +64,7 @@ const checkAndAutoCancelReservations = async () => {
       }
     }
 
-    // Condition 3: Une réservation payée crée un intervalle d’indisponibilité daté.
+    // Condition 3: Une réservation payée crée un intervalle d’indisponibilité daté
     const paidReservations = await Reservation.findAll({
       where: {
         status: "3", // Statut "Payé"
