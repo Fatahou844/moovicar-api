@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       vehiculeId: DataTypes.INTEGER,
-      reservation_duration: DataTypes.ENUM("0", "1", "2", "3", "4"),
+      reservation_duration: DataTypes.ENUM("0", "1", "2", "3", "4", "5", "6"),
       pourcentage_reduction: DataTypes.FLOAT,
     },
     {
