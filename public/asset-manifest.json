@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.31efc62f.css",
-    "main.js": "/static/js/main.c81adfbe.js",
+    "main.js": "/static/js/main.c6138cbb.js",
     "static/media/moovicarhome.png": "/static/media/moovicarhome.1e2eb8708b7122905e4b.png",
     "static/media/car (2).png": "/static/media/car (2).24fbfe87e3bb2f615c7a.png",
     "static/media/vehicule.avif": "/static/media/vehicule.e2fd2cc0aad25daa2850.avif",
@@ -15,10 +15,10 @@
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
     "main.31efc62f.css.map": "/static/css/main.31efc62f.css.map",
-    "main.c81adfbe.js.map": "/static/js/main.c81adfbe.js.map"
+    "main.c6138cbb.js.map": "/static/js/main.c6138cbb.js.map"
   },
   "entrypoints": [
     "static/css/main.31efc62f.css",
-    "static/js/main.c81adfbe.js"
+    "static/js/main.c6138cbb.js"
   ]
 }
