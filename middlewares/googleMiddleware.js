@@ -121,7 +121,7 @@ router.get(
 router.get(
   "/callback",
   passport.authenticate("google", {
-    successRedirect: "/account",
+    successRedirect: "/guest/listing/reservations",
     failureRedirect: config["urlClients"].urlRedirect,
   })
 );
