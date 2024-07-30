@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.820b12bf.css",
-    "main.js": "/static/js/main.29198ebf.js",
+    "main.js": "/static/js/main.f228725f.js",
     "static/media/Citadin.jpg": "/static/media/Citadin.ea7337aa0941c0417f9f.jpg",
     "static/media/SUV.jpg": "/static/media/SUV.56a7c73999cb9148c9b5.jpg",
     "static/media/utilitaire.jpg": "/static/media/utilitaire.d6fe67163917f8d5633c.jpg",
@@ -19,10 +19,10 @@
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
     "main.820b12bf.css.map": "/static/css/main.820b12bf.css.map",
-    "main.29198ebf.js.map": "/static/js/main.29198ebf.js.map"
+    "main.f228725f.js.map": "/static/js/main.f228725f.js.map"
   },
   "entrypoints": [
     "static/css/main.820b12bf.css",
-    "static/js/main.29198ebf.js"
+    "static/js/main.f228725f.js"
   ]
 }
