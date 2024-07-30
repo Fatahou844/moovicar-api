@@ -1,7 +1,11 @@
 {
   "files": {
-    "main.css": "/static/css/main.31efc62f.css",
-    "main.js": "/static/js/main.29371def.js",
+    "main.css": "/static/css/main.820b12bf.css",
+    "main.js": "/static/js/main.e2089f54.js",
+    "static/media/Citadin.jpg": "/static/media/Citadin.ea7337aa0941c0417f9f.jpg",
+    "static/media/SUV.jpg": "/static/media/SUV.56a7c73999cb9148c9b5.jpg",
+    "static/media/utilitaire.jpg": "/static/media/utilitaire.d6fe67163917f8d5633c.jpg",
+    "static/media/monospace.jpg": "/static/media/monospace.bfad1288b699028914a7.jpg",
     "static/media/moovicarhome.png": "/static/media/moovicarhome.1e2eb8708b7122905e4b.png",
     "static/media/car (2).png": "/static/media/car (2).24fbfe87e3bb2f615c7a.png",
     "static/media/vehicule.avif": "/static/media/vehicule.e2fd2cc0aad25daa2850.avif",
@@ -14,11 +18,11 @@
     "static/media/noimage.webp": "/static/media/noimage.600d7c1e9c3fb5db22c5.webp",
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
-    "main.31efc62f.css.map": "/static/css/main.31efc62f.css.map",
-    "main.29371def.js.map": "/static/js/main.29371def.js.map"
+    "main.820b12bf.css.map": "/static/css/main.820b12bf.css.map",
+    "main.e2089f54.js.map": "/static/js/main.e2089f54.js.map"
   },
   "entrypoints": [
-    "static/css/main.31efc62f.css",
-    "static/js/main.29371def.js"
+    "static/css/main.820b12bf.css",
+    "static/js/main.e2089f54.js"
   ]
 }
