@@ -129,6 +129,44 @@ passport.use(
   })
 );
 
+// router.post("/login", function (req, res, next) {
+//   passport.authenticate("local-signin-web2", function (err, user, info) {
+//     if (err) {
+//       return res.status(500).json({ error: err.message }); // Gérer les erreurs d'authentification
+//     }
+//     if (!user) {
+//       return res.status(401).json({ error: "Invalid credentials" }); // Gérer les identifiants incorrects
+//     }
+//     req.logIn(user, function (err) {
+//       if (err) {
+//         return res.status(500).json({ error: err.message }); // Gérer les erreurs de connexion
+//       }
+//       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
+//       res.cookie("jwtToken", token);
+//       return res.status(200).json({ success: true }); // Connexion réussie
+//     });
+//   })(req, res, next);
+// });
+
+// router.post("/support-login", function (req, res, next) {
+//   passport.authenticate("local-signin-admin", function (err, user, info) {
+//     if (err) {
+//       return res.status(500).json({ error: err.message }); // Gérer les erreurs d'authentification
+//     }
+//     if (!user) {
+//       return res.status(401).json({ error: "Invalid credentials" }); // Gérer les identifiants incorrects
+//     }
+//     req.logIn(user, function (err) {
+//       if (err) {
+//         return res.status(500).json({ error: err.message }); // Gérer les erreurs de connexion
+//       }
+//       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
+//       res.cookie("jwtToken", token);
+//       return res.status(200).json({ success: true, jwtToken: token }); // Connexion réussie
+//     });
+//   })(req, res, next);
+// });
+
 router.post("/login", function (req, res, next) {
   passport.authenticate("local-signin-web2", function (err, user, info) {
     if (err) {
@@ -229,11 +267,11 @@ router.get("/", (req, res) => {
       .then((user) => {
         if (!user) {
           res.send(null);
+        } else {
+          req.user.role = "user";
+
+          res.send(req.user || null);
         }
-
-        req.user.role = "user";
-
-        res.send(req.user || null);
       })
       .catch((err) => {
         res.send(null);
@@ -363,16 +401,16 @@ router.get("/admin", (req, res) => {
       .then((user) => {
         if (!user) {
           res.send(null);
+        } else {
+          const userdata = {
+            email: user.email,
+            first_name: user.firstName,
+            id: user.id,
+            last_name: user.lastName,
+            role: "administrator",
+          };
+          res.send(userdata || null);
         }
-
-        const userdata = {
-          email: user.email,
-          first_name: user.firstName,
-          id: user.id,
-          last_name: user.lastName,
-          role: "administrator",
-        };
-        res.send(userdata || null);
       })
       .catch((err) => {
         res.send(null);
@@ -383,7 +421,7 @@ router.get("/admin", (req, res) => {
 });
 
 router.get("/admin/auth/check-auth", (req, res) => {
-  if (req.isAuthenticated() && req.user.userRole === "admin") {
+  if (req.isAuthenticated()) {
     res.json({ isAuthenticated: true });
   } else {
     res.json({ isAuthenticated: false });
