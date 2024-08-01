@@ -59,6 +59,9 @@ module.exports = (sequelize, DataTypes) => {
       last4: DataTypes.STRING,
       exp_month: DataTypes.STRING,
       exp_year: DataTypes.STRING,
+      PermisConduireDoc: DataTypes.STRING,
+      PieceIdentityDoc: DataTypes.STRING,
+      ImmatriculationDoc: DataTypes.STRING,
     },
     {
       sequelize,
