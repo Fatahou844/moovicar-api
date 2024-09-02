@@ -48,7 +48,7 @@ const io = socketIo(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    secure: true,
+    secure: false,
     credentials: true, // Permet l'envoi de cookies
   },
 });
@@ -74,6 +74,12 @@ app.use(
     secret: "RETFFFXDSERGp38uY8EZlKEoGLWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: false,
+      secure: false, // Ne pas utiliser sur localhost sans HTTPS
+      sameSite: "Lax", // Pour le développement local
+      path: "/", // Ne spécifiez pas le domaine ici
+    },
   })
 );
 

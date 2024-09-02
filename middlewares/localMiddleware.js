@@ -180,7 +180,12 @@ router.post("/login", function (req, res, next) {
         return res.status(500).json({ error: err.message }); // Gérer les erreurs de connexion
       }
       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
-      res.cookie("jwtToken", token);
+      res.cookie("jwtToken", token, {
+        httpOnly: true,
+        secure: false, // Ne pas utiliser sur localhost sans HTTPS
+        sameSite: "Lax", // Pour le développement local
+        path: "/", // Ne spécifiez pas le domaine ici
+      });
       return res.status(200).json({ success: true }); // Connexion réussie
     });
   })(req, res, next);
