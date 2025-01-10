@@ -1,0 +1,29 @@
+name: Deploy to Server
+
+# Déclencheur : Le workflow s'exécute lors d'un push sur la branche "main"
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Le workflow s'exécute sur une machine virtuelle Ubuntu
+
+    steps:
+      # Étape 1 : Cloner le dépôt
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Étape 2 : Configurer SSH pour se connecter au serveur
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }} # Clé privée stockée dans les secrets GitHub
+
+      # Étape 3 : Déployer l'application sur le serveur
+      - name: Deploy application
+        run: |
+          ssh -o StrictHostKeyChecking=no user@195.35.29.160 'cd ~/public_html/moovicar-api && git pull origin master && pm2 restart moovicar'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
