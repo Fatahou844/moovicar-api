@@ -1,23 +1,31 @@
 {
   "files": {
-    "main.css": "/static/css/main.ed11c68a.css",
-    "main.js": "/static/js/main.4841c030.js",
+    "main.css": "/static/css/main.820b12bf.css",
+    "main.js": "/static/js/main.549beb53.js",
+    "static/media/Citadin.jpg": "/static/media/Citadin.ea7337aa0941c0417f9f.jpg",
+    "static/media/SUV.jpg": "/static/media/SUV.56a7c73999cb9148c9b5.jpg",
+    "static/media/utilitaire.jpg": "/static/media/utilitaire.d6fe67163917f8d5633c.jpg",
+    "static/media/monospace.jpg": "/static/media/monospace.bfad1288b699028914a7.jpg",
+    "static/media/moovicarhome.png": "/static/media/moovicarhome.1e2eb8708b7122905e4b.png",
     "static/media/car (2).png": "/static/media/car (2).24fbfe87e3bb2f615c7a.png",
     "static/media/vehicule.avif": "/static/media/vehicule.e2fd2cc0aad25daa2850.avif",
+    "static/media/logoMoovicar.png": "/static/media/logoMoovicar.c83d84e52890cf872122.png",
     "static/media/interiorcar.jpg": "/static/media/interiorcar.1b6f5ac21524d35c0ea1.jpg",
     "static/media/avantcar.jpg": "/static/media/avantcar.e06d92110ffa97ee8d8d.jpg",
     "static/media/lateral.jpg": "/static/media/lateral.eb3198edb8e4c50c4e17.jpg",
-    "static/media/hero_FR.avif": "/static/media/hero_FR.f55859c891f304147a75.avif",
-    "static/media/logo.png": "/static/media/logo.b27981259d2f1aeb4963.png",
+    "static/media/adventure-1851092_640.jpg": "/static/media/adventure-1851092_640.f7f8679d188fb96aa1e9.jpg",
+    "static/media/madeinfr(1).png": "/static/media/madeinfr(1).f3b56c878123e083690c.png",
+    "static/media/consulting-3031678_640.jpg": "/static/media/consulting-3031678_640.a16a320f1e61b645b2ba.jpg",
+    "static/media/key-791390_640.jpg": "/static/media/key-791390_640.0ae1242a1517f1bc6522.jpg",
     "static/media/user.png": "/static/media/user.a6143582309785dca610.png",
     "static/media/noimage.webp": "/static/media/noimage.600d7c1e9c3fb5db22c5.webp",
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
-    "main.ed11c68a.css.map": "/static/css/main.ed11c68a.css.map",
-    "main.4841c030.js.map": "/static/js/main.4841c030.js.map"
+    "main.820b12bf.css.map": "/static/css/main.820b12bf.css.map",
+    "main.549beb53.js.map": "/static/js/main.549beb53.js.map"
   },
   "entrypoints": [
-    "static/css/main.ed11c68a.css",
-    "static/js/main.4841c030.js"
+    "static/css/main.820b12bf.css",
+    "static/js/main.549beb53.js"
   ]
 }
