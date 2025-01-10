@@ -182,7 +182,7 @@ router.post("/login", function (req, res, next) {
       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
       res.cookie("jwtToken", token, {
         httpOnly: true,
-        secure: false, // Ne pas utiliser sur localhost sans HTTPS
+        secure: true, // Ne pas utiliser sur localhost sans HTTPS
         sameSite: "Lax", // Pour le développement local
         path: "/", // Ne spécifiez pas le domaine ici
       });
