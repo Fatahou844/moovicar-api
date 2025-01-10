@@ -24,6 +24,6 @@ jobs:
       # Étape 3 : Déployer l'application sur le serveur
       - name: Deploy application
         run: |
-          ssh -o StrictHostKeyChecking=no user@195.35.29.160 'cd ~/public_html/moovicar-api && git pull origin master && pm2 restart moovicar'
+          ssh -o StrictHostKeyChecking=no root@195.35.29.160 'cd ~/public_html/moovicar-api && git pull origin master && pm2 restart moovicar'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
