@@ -75,10 +75,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "Strict", // Nécessaire pour permettre les cookies cross-domain
+      // sameSite: "Strict", // Nécessaire pour permettre les cookies cross-domain
       httpOnly: false,
       domain: ".app.moovicar.com",
-      secure: false, // Protège le cookie d'un accès JavaScript
+      secure: true, // Protège le cookie d'un accès JavaScript
     },
   })
 );
