@@ -74,12 +74,12 @@ app.use(
     secret: "RETFFFXDSERGp38uY8EZlKEoGLWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
     resave: false,
     saveUninitialized: false,
-    // cookie: {
-    //   // sameSite: "Strict", // Nécessaire pour permettre les cookies cross-domain
-    //   httpOnly: false,
-    //   // domain: ".app.moovicar.com",
-    //   secure: false, // Protège le cookie d'un accès JavaScript
-    // },
+    cookie: {
+      // sameSite: "Strict", // Nécessaire pour permettre les cookies cross-domain
+      httpOnly: false,
+      domain: ".app.moovicar.com",
+      secure: false, // Protège le cookie d'un accès JavaScript
+    },
   })
 );
 
