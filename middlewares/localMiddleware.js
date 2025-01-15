@@ -181,10 +181,10 @@ router.post("/login", function (req, res, next) {
       }
       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
       res.cookie("jwtToken", token, {
-        httpOnly: true,
-        secure: true, // Ne pas utiliser sur localhost sans HTTPS
-        sameSite: "Lax", // Pour le développement local
-        path: "/", // Ne spécifiez pas le domaine ici
+        sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
+        httpOnly: false,
+        domain: ".moovicar.com",
+        secure: true, // Protège le cookie d'un accès JavaScript
       });
       return res.status(200).json({ success: true }); // Connexion réussie
     });
