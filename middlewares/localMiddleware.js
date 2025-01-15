@@ -183,7 +183,7 @@ router.post("/login", function (req, res, next) {
       res.cookie("jwtToken", token, {
         sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
         httpOnly: false,
-        domain: ".moovicar.com",
+        domain: ".app.moovicar.com",
         secure: true, // Protège le cookie d'un accès JavaScript
       });
       return res.status(200).json({ success: true }); // Connexion réussie

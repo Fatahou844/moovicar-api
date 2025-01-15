@@ -77,8 +77,8 @@ app.use(
     cookie: {
       sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
       httpOnly: false,
-      domain: ".moovicar.com",
-      secure: false, // Protège le cookie d'un accès JavaScript
+      domain: ".app.moovicar.com",
+      secure: true, // Protège le cookie d'un accès JavaScript
     },
   })
 );
