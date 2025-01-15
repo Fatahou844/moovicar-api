@@ -184,7 +184,7 @@ router.post("/login", function (req, res, next) {
         sameSite: "Strict", // Nécessaire pour permettre les cookies cross-domain
         httpOnly: false,
         domain: "app.moovicar.com",
-        secure: true, // Protège le cookie d'un accès JavaScript
+        secure: false, // Protège le cookie d'un accès JavaScript
         maxAge: 24 * 60 * 60 * 1000, // Durée de vie du cookie (1 jour, par exemple)
       });
       return res.status(200).json({ success: true }); // Connexion réussie
