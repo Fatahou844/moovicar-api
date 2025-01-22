@@ -159,7 +159,7 @@ router.post("/login", function (req, res, next) {
         domain: ".app.moovicar.com",
         path: "/",
         secure: true,
-        httpOnly: true,
+        httpOnly: false,
         sameSite: "Lax",
       });
       return res.status(200).json({ success: true }); // Connexion réussie
