@@ -266,8 +266,10 @@ router.get("/verify", (req, res) => {
   res.redirect("/");
 });
 
-router.get("/", (req, res) => {
-  if (req.isAuthenticated()) {
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
     // Query the database to retrieve user data
     userprofile
       .findOne({ where: { email: req.user.email } })
@@ -283,18 +285,16 @@ router.get("/", (req, res) => {
       .catch((err) => {
         res.send(null);
       });
-  } else {
-    res.send(null);
   }
-});
+);
 
-router.get("/auth/check-auth", (req, res) => {
-  if (req.isAuthenticated()) {
+router.get(
+  "/auth/check-auth",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
     res.json({ isAuthenticated: true });
-  } else {
-    res.json({ isAuthenticated: false });
   }
-});
+);
 
 // Création d'un client Stripe et mise à jour de la base de données
 router.post(
@@ -399,8 +399,10 @@ router.post(
   }
 );
 
-router.get("/admin", (req, res) => {
-  if (req.isAuthenticated()) {
+router.get(
+  "/admin",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
     // Query the database to retrieve user data
     MoovicarUsers.findOne({
       where: { email: req.user.email },
@@ -422,10 +424,8 @@ router.get("/admin", (req, res) => {
       .catch((err) => {
         res.send(null);
       });
-  } else {
-    res.send(null);
   }
-});
+);
 
 router.get("/admin/auth/check-auth", (req, res) => {
   if (req.isAuthenticated()) {
@@ -437,6 +437,7 @@ router.get("/admin/auth/check-auth", (req, res) => {
 
 router.get("/logout", (req, res) => {
   res.clearCookie("connect.sid"); // This logs out the user.
+  res.clearCookie("jwttoken"); // This logs out the user.
 
   res.redirect("/");
 });
