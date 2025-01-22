@@ -18757,3 +18757,381 @@
   label: 'winston veritatrust format',
   timestamp: 'Jan-10-2025 11:40:01'
 }
+{
+  message: 'Serveur backend lancé sur le port 3001',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:00'
+}
+{
+  message: 'Connected to the database',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:02'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:34'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:35'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:36'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:37'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:41'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:41'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:48'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:48'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:49'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:48:49'
+}
+{
+  message: 'Serveur backend lancé sur le port 3001',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:50:06'
+}
+{
+  message: 'Connected to the database',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:50:07'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received in stripe middleware:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:50:09'
+}
+{
+  level: 'info',
+  message: 'User not found for email:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:50:09'
+}
+{
+  message: 'Serveur backend lancé sur le port 3001',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:16'
+}
+{
+  message: 'Connected to the database',
+  level: 'info',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:18'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:20'
+}
+{
+  dataValues: {
+    id: 4,
+    userId: null,
+    firstName: null,
+    lastName: null,
+    dateNaissance: null,
+    email: 'louisfatah23@gmail.com',
+    password: '$2b$10$9lGFaQnkZnw9uHVtfnpY5u/AX082I5G6cthi85x64TbpMdgWGBT0a',
+    googleId: '106665351806145129984',
+    facebookId: null,
+    verification_token: '7e472666-886e-45b0-9e30-427913e1e73f',
+    verified: true,
+    token: 'ya29.a0AfB_byCKri9lmewIXzbH8Rdk9_vOTTJpsi6WG75y_qUHmvgMEP4-BNXFfxsuMDWk53am4XGucEo3eniMnZVhlLhYX8MJN2q3izO2c27fA-M_DQBWUDeUICds1f5PHYpXGz4tDHVINU_MdEvONsQ56ndDDsW5Ne7WoKXKaCgYKAbESARISFQHGX2Mid-O2PX4ou4FKgOSH01ySBQ0171',
+    profile_url: 'https://res.cloudinary.com/dtrkcpsky/image/upload/v1699896703/samples/people/boy-snow-hoodie.jpg',
+    phoneNumber: null,
+    city: null,
+    country: null,
+    immatriculation: '23455-8677',
+    tvaNumber: null,
+    statusDriver: null,
+    OpenID: null,
+    access_tokenPaypal: null,
+    app_id: null,
+    AcceptanceRate: 0,
+    ResponseRate: null,
+    EngagementRate: null,
+    EvaluationNumber: null,
+    Finalizedtrips: 0,
+    PermisConduire: false,
+    PieceIdentite: false,
+    ExpertVitesseManuelle: false,
+    stripeCustomerId: null,
+    stripeAccountId: null,
+    last4: null,
+    exp_month: null,
+    exp_year: null,
+    PermisConduireDoc: null,
+    PieceIdentityDoc: null,
+    ImmatriculationDoc: null,
+    createdAt: 2024-02-14T17:36:18.000Z,
+    updatedAt: 2024-08-20T17:20:33.000Z
+  },
+  _previousDataValues: {
+    id: 4,
+    userId: null,
+    firstName: null,
+    lastName: null,
+    dateNaissance: null,
+    email: 'louisfatah23@gmail.com',
+    password: '$2b$10$9lGFaQnkZnw9uHVtfnpY5u/AX082I5G6cthi85x64TbpMdgWGBT0a',
+    googleId: '106665351806145129984',
+    facebookId: null,
+    verification_token: '7e472666-886e-45b0-9e30-427913e1e73f',
+    verified: true,
+    token: 'ya29.a0AfB_byCKri9lmewIXzbH8Rdk9_vOTTJpsi6WG75y_qUHmvgMEP4-BNXFfxsuMDWk53am4XGucEo3eniMnZVhlLhYX8MJN2q3izO2c27fA-M_DQBWUDeUICds1f5PHYpXGz4tDHVINU_MdEvONsQ56ndDDsW5Ne7WoKXKaCgYKAbESARISFQHGX2Mid-O2PX4ou4FKgOSH01ySBQ0171',
+    profile_url: 'https://res.cloudinary.com/dtrkcpsky/image/upload/v1699896703/samples/people/boy-snow-hoodie.jpg',
+    phoneNumber: null,
+    city: null,
+    country: null,
+    immatriculation: '23455-8677',
+    tvaNumber: null,
+    statusDriver: null,
+    OpenID: null,
+    access_tokenPaypal: null,
+    app_id: null,
+    AcceptanceRate: 0,
+    ResponseRate: null,
+    EngagementRate: null,
+    EvaluationNumber: null,
+    Finalizedtrips: 0,
+    PermisConduire: false,
+    PieceIdentite: false,
+    ExpertVitesseManuelle: false,
+    stripeCustomerId: null,
+    stripeAccountId: null,
+    last4: null,
+    exp_month: null,
+    exp_year: null,
+    PermisConduireDoc: null,
+    PieceIdentityDoc: null,
+    ImmatriculationDoc: null,
+    createdAt: 2024-02-14T17:36:18.000Z,
+    updatedAt: 2024-08-20T17:20:33.000Z
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',                 'userId',
+      'firstName',          'lastName',
+      'dateNaissance',      'email',
+      'password',           'googleId',
+      'facebookId',         'verification_token',
+      'verified',           'token',
+      'profile_url',        'phoneNumber',
+      'city',               'country',
+      'immatriculation',    'tvaNumber',
+      'statusDriver',       'OpenID',
+      'access_tokenPaypal', 'app_id',
+      'AcceptanceRate',     'ResponseRate',
+      'EngagementRate',     'EvaluationNumber',
+      'Finalizedtrips',     'PermisConduire',
+      'PieceIdentite',      'ExpertVitesseManuelle',
+      'stripeCustomerId',   'stripeAccountId',
+      'last4',              'exp_month',
+      'exp_year',           'PermisConduireDoc',
+      'PieceIdentityDoc',   'ImmatriculationDoc',
+      'createdAt',          'updatedAt'
+    ]
+  },
+  isNewRecord: false,
+  level: 'info',
+  message: 'User found:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:20'
+}
+{
+  sub: 'louisfatah23@gmail.com',
+  iat: 1737539195,
+  level: 'info',
+  message: 'JWT payload received:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:26'
+}
+{
+  dataValues: {
+    id: 4,
+    userId: null,
+    firstName: null,
+    lastName: null,
+    dateNaissance: null,
+    email: 'louisfatah23@gmail.com',
+    password: '$2b$10$9lGFaQnkZnw9uHVtfnpY5u/AX082I5G6cthi85x64TbpMdgWGBT0a',
+    googleId: '106665351806145129984',
+    facebookId: null,
+    verification_token: '7e472666-886e-45b0-9e30-427913e1e73f',
+    verified: true,
+    token: 'ya29.a0AfB_byCKri9lmewIXzbH8Rdk9_vOTTJpsi6WG75y_qUHmvgMEP4-BNXFfxsuMDWk53am4XGucEo3eniMnZVhlLhYX8MJN2q3izO2c27fA-M_DQBWUDeUICds1f5PHYpXGz4tDHVINU_MdEvONsQ56ndDDsW5Ne7WoKXKaCgYKAbESARISFQHGX2Mid-O2PX4ou4FKgOSH01ySBQ0171',
+    profile_url: 'https://res.cloudinary.com/dtrkcpsky/image/upload/v1699896703/samples/people/boy-snow-hoodie.jpg',
+    phoneNumber: null,
+    city: null,
+    country: null,
+    immatriculation: '23455-8677',
+    tvaNumber: null,
+    statusDriver: null,
+    OpenID: null,
+    access_tokenPaypal: null,
+    app_id: null,
+    AcceptanceRate: 0,
+    ResponseRate: null,
+    EngagementRate: null,
+    EvaluationNumber: null,
+    Finalizedtrips: 0,
+    PermisConduire: false,
+    PieceIdentite: false,
+    ExpertVitesseManuelle: false,
+    stripeCustomerId: null,
+    stripeAccountId: null,
+    last4: null,
+    exp_month: null,
+    exp_year: null,
+    PermisConduireDoc: null,
+    PieceIdentityDoc: null,
+    ImmatriculationDoc: null,
+    createdAt: 2024-02-14T17:36:18.000Z,
+    updatedAt: 2024-08-20T17:20:33.000Z
+  },
+  _previousDataValues: {
+    id: 4,
+    userId: null,
+    firstName: null,
+    lastName: null,
+    dateNaissance: null,
+    email: 'louisfatah23@gmail.com',
+    password: '$2b$10$9lGFaQnkZnw9uHVtfnpY5u/AX082I5G6cthi85x64TbpMdgWGBT0a',
+    googleId: '106665351806145129984',
+    facebookId: null,
+    verification_token: '7e472666-886e-45b0-9e30-427913e1e73f',
+    verified: true,
+    token: 'ya29.a0AfB_byCKri9lmewIXzbH8Rdk9_vOTTJpsi6WG75y_qUHmvgMEP4-BNXFfxsuMDWk53am4XGucEo3eniMnZVhlLhYX8MJN2q3izO2c27fA-M_DQBWUDeUICds1f5PHYpXGz4tDHVINU_MdEvONsQ56ndDDsW5Ne7WoKXKaCgYKAbESARISFQHGX2Mid-O2PX4ou4FKgOSH01ySBQ0171',
+    profile_url: 'https://res.cloudinary.com/dtrkcpsky/image/upload/v1699896703/samples/people/boy-snow-hoodie.jpg',
+    phoneNumber: null,
+    city: null,
+    country: null,
+    immatriculation: '23455-8677',
+    tvaNumber: null,
+    statusDriver: null,
+    OpenID: null,
+    access_tokenPaypal: null,
+    app_id: null,
+    AcceptanceRate: 0,
+    ResponseRate: null,
+    EngagementRate: null,
+    EvaluationNumber: null,
+    Finalizedtrips: 0,
+    PermisConduire: false,
+    PieceIdentite: false,
+    ExpertVitesseManuelle: false,
+    stripeCustomerId: null,
+    stripeAccountId: null,
+    last4: null,
+    exp_month: null,
+    exp_year: null,
+    PermisConduireDoc: null,
+    PieceIdentityDoc: null,
+    ImmatriculationDoc: null,
+    createdAt: 2024-02-14T17:36:18.000Z,
+    updatedAt: 2024-08-20T17:20:33.000Z
+  },
+  uniqno: 1,
+  _changed: Set(0) {},
+  _options: {
+    isNewRecord: false,
+    _schema: null,
+    _schemaDelimiter: '',
+    raw: true,
+    attributes: [
+      'id',                 'userId',
+      'firstName',          'lastName',
+      'dateNaissance',      'email',
+      'password',           'googleId',
+      'facebookId',         'verification_token',
+      'verified',           'token',
+      'profile_url',        'phoneNumber',
+      'city',               'country',
+      'immatriculation',    'tvaNumber',
+      'statusDriver',       'OpenID',
+      'access_tokenPaypal', 'app_id',
+      'AcceptanceRate',     'ResponseRate',
+      'EngagementRate',     'EvaluationNumber',
+      'Finalizedtrips',     'PermisConduire',
+      'PieceIdentite',      'ExpertVitesseManuelle',
+      'stripeCustomerId',   'stripeAccountId',
+      'last4',              'exp_month',
+      'exp_year',           'PermisConduireDoc',
+      'PieceIdentityDoc',   'ImmatriculationDoc',
+      'createdAt',          'updatedAt'
+    ]
+  },
+  isNewRecord: false,
+  level: 'info',
+  message: 'User found:',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-22-2025 10:54:26'
+}
