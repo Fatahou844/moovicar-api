@@ -427,6 +427,8 @@ router.get(
   }
 );
 
+//
+
 router.get("/admin/auth/check-auth", (req, res) => {
   if (req.isAuthenticated()) {
     res.json({ isAuthenticated: true });
