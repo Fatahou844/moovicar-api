@@ -239,7 +239,7 @@ router.get("/verify", (req, res) => {
 
   res.redirect("/");
 });
-
+//
 router.get(
   "/",
   passport.authenticate("user-jwt", { session: false }),
