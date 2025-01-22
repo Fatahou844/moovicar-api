@@ -94,40 +94,40 @@ const jwtOptions = {
   secretOrKey: process.env.SECRET_SESSION_JWT,
 };
 
-passport.use(
-  "userprofile",
-  new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
-    logger.info("JWT payload received in localMiddleware:", jwt_payload);
-    try {
-      const user = await userprofile.findOne({
-        where: { email: jwt_payload.sub },
-      });
+// passport.use(
+//   "userprofile",
+//   new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
+//     logger.info("JWT payload received in localMiddleware:", jwt_payload);
+//     try {
+//       const user = await userprofile.findOne({
+//         where: { email: jwt_payload.sub },
+//       });
 
-      if (user) {
-        logger.info(
-          "Je suis sur la verification des utilisateurs lambda:",
-          user
-        );
-        return done(null, user);
-      } else {
-        const user = await MoovicarUsers.findOne({
-          where: { email: jwt_payload.sub },
-        });
+//       if (user) {
+//         logger.info(
+//           "Je suis sur la verification des utilisateurs lambda:",
+//           user
+//         );
+//         return done(null, user);
+//       } else {
+//         const user = await MoovicarUsers.findOne({
+//           where: { email: jwt_payload.sub },
+//         });
 
-        if (user) {
-          logger.info("User found:", user);
-          return done(null, user);
-        } else {
-          logger.info("User not found for email:", jwt_payload.sub);
-          return done(null, false);
-        }
-      }
-    } catch (err) {
-      logger.error("Error while finding user:", err);
-      return done(err, false);
-    }
-  })
-);
+//         if (user) {
+//           logger.info("User found:", user);
+//           return done(null, user);
+//         } else {
+//           logger.info("User not found for email:", jwt_payload.sub);
+//           return done(null, false);
+//         }
+//       }
+//     } catch (err) {
+//       logger.error("Error while finding user:", err);
+//       return done(err, false);
+//     }
+//   })
+// );
 
 // router.post("/login", function (req, res, next) {
 //   passport.authenticate("local-signin-web2", function (err, user, info) {
@@ -166,6 +166,52 @@ passport.use(
 //     });
 //   })(req, res, next);
 // });
+
+passport.use(
+  new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
+    logger.info("JWT payload received:", jwt_payload);
+    try {
+      const user = await userprofile.findOne({
+        where: { email: jwt_payload.sub },
+      });
+
+      if (user) {
+        logger.info("User found:", user);
+        return done(null, user);
+      } else {
+        logger.info("User not found for email:", jwt_payload.sub);
+        return done(null, false);
+      }
+    } catch (err) {
+      logger.error("Error while finding user:", err);
+      return done(err, false);
+    }
+  })
+);
+
+// Stratégie spécifique pour les admins
+passport.use(
+  "admin-jwt", // Donne un nom unique à cette stratégie
+  new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
+    logger.info("JWT payload received for admin:", jwt_payload);
+    try {
+      const user = await MoovicarUsers.findOne({
+        where: { email: jwt_payload.sub }, // Vérifie si l'utilisateur est un admin
+      });
+
+      if (user) {
+        logger.info("Admin found:", user);
+        return done(null, user);
+      } else {
+        logger.info("Admin not found for email:", jwt_payload.sub);
+        return done(null, false); // Refuser l'accès si l'utilisateur n'est pas admin
+      }
+    } catch (err) {
+      logger.error("Error while finding admin:", err);
+      return done(err, false);
+    }
+  })
+);
 
 router.post("/login", function (req, res, next) {
   passport.authenticate("local-signin-web2", function (err, user, info) {
@@ -401,7 +447,7 @@ router.post(
 
 router.get(
   "/admin",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("admin-jwt", { session: false }),
   (req, res) => {
     // Query the database to retrieve user data
     MoovicarUsers.findOne({
@@ -429,13 +475,13 @@ router.get(
 
 //
 
-router.get("/admin/auth/check-auth", (req, res) => {
-  if (req.isAuthenticated()) {
+router.get(
+  "/admin/auth/check-auth",
+  passport.authenticate("admin-jwt", { session: false }),
+  (req, res) => {
     res.json({ isAuthenticated: true });
-  } else {
-    res.json({ isAuthenticated: false });
   }
-});
+);
 
 router.get("/logout", (req, res) => {
   res.clearCookie("connect.sid"); // This logs out the user.
