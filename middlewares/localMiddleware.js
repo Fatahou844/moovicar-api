@@ -181,7 +181,7 @@ router.post("/login", function (req, res, next) {
       }
       const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
       res.cookie("jwtToken", token, {
-        sameSite: "Lax", // Nécessaire pour permettre les cookies cross-domain
+        sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
         httpOnly: true,
         domain: ".app.moovicar.com",
         secure: true, // Protège le cookie d'un accès JavaScript
