@@ -76,8 +76,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
-      httpOnly: true,
-      secure: true,
+      httpOnly: false,
+      secure: false,
       domain: "app.moovicar.com", // Protège le cookie d'un accès JavaScript
       maxAge: 24 * 60 * 60 * 1000, // Durée de vie du cookie (1 jour, par exemple)
     },
