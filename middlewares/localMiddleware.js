@@ -251,7 +251,7 @@ router.get(
         if (!user) {
           res.send(null);
         } else {
-          req.user.role = "user";
+          req.user = { ...req.user.toJSON(), role: "user" };
 
           res.send(req.user || null);
         }
