@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.820b12bf.css",
-    "main.js": "/static/js/main.ea24f736.js",
+    "main.css": "/static/css/main.c260671a.css",
+    "main.js": "/static/js/main.cb9ca5d3.js",
     "static/media/Citadin.jpg": "/static/media/Citadin.ea7337aa0941c0417f9f.jpg",
     "static/media/SUV.jpg": "/static/media/SUV.56a7c73999cb9148c9b5.jpg",
     "static/media/utilitaire.jpg": "/static/media/utilitaire.d6fe67163917f8d5633c.jpg",
@@ -21,11 +21,11 @@
     "static/media/noimage.webp": "/static/media/noimage.600d7c1e9c3fb5db22c5.webp",
     "index.html": "/index.html",
     "static/media/badge.svg": "/static/media/badge.3e06b8a26bdb006a60ff216cb53724f3.svg",
-    "main.820b12bf.css.map": "/static/css/main.820b12bf.css.map",
-    "main.ea24f736.js.map": "/static/js/main.ea24f736.js.map"
+    "main.c260671a.css.map": "/static/css/main.c260671a.css.map",
+    "main.cb9ca5d3.js.map": "/static/js/main.cb9ca5d3.js.map"
   },
   "entrypoints": [
-    "static/css/main.820b12bf.css",
-    "static/js/main.ea24f736.js"
+    "static/css/main.c260671a.css",
+    "static/js/main.cb9ca5d3.js"
   ]
 }

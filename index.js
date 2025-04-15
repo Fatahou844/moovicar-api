@@ -322,6 +322,21 @@ app.get("/api/autocomplete", async (req, res) => {
   }
 });
 
+app.get("/api/autocomplete/mapbox", async (req, res) => {
+  const { input } = req.query;
+  const apiKey =
+    "sk.eyJ1IjoiYWhhbWFkaSIsImEiOiJjbTlpZHJoOWswMTV4MmlxdjNvMjllN2FvIn0.L5XqZDCk_aWwOSog5FVB7g";
+  try {
+    const response = await fetch(
+      `https://api.mapbox.com/search/geocode/v6/forward?q=${input}&limit=10&access_token=${apiKey}&country=fr`
+    );
+    const data = await response.json();
+    res.json(data?.features || []);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.get("/api/details", async (req, res) => {
   const { place_id } = req.query;
   const apiKey = "AIzaSyCohDl0FgnpiYEtbTE1EURv4WYEaM_Xtow";
