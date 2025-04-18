@@ -118,12 +118,31 @@ router.get(
   }
 );
 
+// router.get(
+//   "/callback",
+//   passport.authenticate("google", {
+//     successRedirect: "/guest/listing/reservations",
+//     failureRedirect: config["urlClients"].urlRedirect,
+//   })
+// );
+
 router.get(
   "/callback",
   passport.authenticate("google", {
-    successRedirect: "/guest/listing/reservations",
     failureRedirect: config["urlClients"].urlRedirect,
-  })
+  }),
+  (req, res) => {
+    const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
+    res.cookie("jwtToken", token, {
+      maxAge: 86400 * 1000,
+      domain: ".app.moovicar.com",
+      path: "/",
+      secure: true,
+      httpOnly: false,
+      sameSite: "Lax",
+    });
+    res.redirect("/guest/listing/reservations");
+  }
 );
 
 module.exports = router;
