@@ -141,7 +141,7 @@ router.get(
       httpOnly: false,
       sameSite: "Lax",
     });
-    res.redirect("/guest/listing/reservations");
+    res.redirect("https://app.moovicar.com/guest/listing/reservations");
   }
 );
 
