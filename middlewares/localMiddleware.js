@@ -413,24 +413,10 @@ router.get(
 );
 
 router.get("/logout", (req, res) => {
-  // Supprimer les cookies
-  res.clearCookie("connect.sid", { path: "/" });
-  res.clearCookie("jwtToken", { path: "/" });
+  res.clearCookie("connect.sid"); // This logs out the user.
+  res.clearCookie("jwtToken"); // This logs out the user.
 
-  // Si vous utilisez express-session :
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Erreur lors de la destruction de la session:", err);
-        return res.status(500).send("Erreur lors de la déconnexion");
-      }
-
-      // Redirection après la destruction
-      res.redirect("/");
-    });
-  } else {
-    res.redirect("/");
-  }
+  res.redirect("/");
 });
 
 router.post("/create-connected-account", async (req, res) => {
