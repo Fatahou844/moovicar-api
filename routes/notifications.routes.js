@@ -25,6 +25,7 @@ const jwtOptions = {
 };
 
 passport.use(
+  "user-jwt",
   new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
     console.log("JWT payload received in notifications routes:", jwt_payload);
     try {
@@ -50,7 +51,7 @@ router.post("/", createNotification);
 router.get("/searchbyid/:id", getNotificationById);
 router.get(
   "/searchbyuserid/:userId",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("user-jwt", { session: false }),
   getNotificationByUserId
 );
 router.get("/", getNotifications);

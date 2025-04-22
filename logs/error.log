@@ -4486,3 +4486,32 @@
   label: 'winston veritatrust format',
   timestamp: 'Jul-22-2024 13:15:00'
 }
+{
+  name: 'SequelizeConnectionError',
+  parent: Error: connect ETIMEDOUT
+      at Connection._handleTimeoutError (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:205:17)
+      at listOnTimeout (node:internal/timers:581:17)
+      at process.processTimers (node:internal/timers:519:7) {
+    errorno: 'ETIMEDOUT',
+    code: 'ETIMEDOUT',
+    syscall: 'connect',
+    fatal: true
+  },
+  original: Error: connect ETIMEDOUT
+      at Connection._handleTimeoutError (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:205:17)
+      at listOnTimeout (node:internal/timers:581:17)
+      at process.processTimers (node:internal/timers:519:7) {
+    errorno: 'ETIMEDOUT',
+    code: 'ETIMEDOUT',
+    syscall: 'connect',
+    fatal: true
+  },
+  level: 'error',
+  message: "Erreur lors de l'annulation automatique des réservations: connect ETIMEDOUT",
+  stack: 'SequelizeConnectionError: connect ETIMEDOUT\n' +
+    '    at ConnectionManager.connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\mysql\\connection-manager.js:102:17)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async ConnectionManager._connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\abstract\\connection-manager.js:222:24)',
+  label: 'winston veritatrust format',
+  timestamp: 'Apr-22-2025 09:01:10'
+}
