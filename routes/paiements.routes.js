@@ -12,11 +12,12 @@ dotenv.config();
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.SECRET_SESSION_JWT,
+  secretOrKey:
+    "RETFFFXDSERGp38uY8EZlKEoGLvx1LYWhgs0-rX0-p6vtpE72HHz9XqizGgHHNZ",
 };
 
 passport.use(
-  new JwtStrategy("admin-jwt", jwtOptions, async function (jwt_payload, done) {
+  new JwtStrategy(jwtOptions, async function (jwt_payload, done) {
     logger.info("JWT payload received in paiement route:", jwt_payload);
     try {
       const user = await MoovicarUsers.findOne({
@@ -42,14 +43,10 @@ const {
   updatePaiement,
 } = require("../controllers/paiements.controller");
 
-router.get(
-  "/",
-  passport.authenticate("admin-jwt", { session: false }),
-  getPaiements
-);
+router.get("/", passport.authenticate("jwt", { session: false }), getPaiements);
 router.put(
   "/:id",
-  passport.authenticate("admin-jwt", { session: false }),
+  passport.authenticate("jwt", { session: false }),
   updatePaiement
 );
 module.exports = router;
