@@ -414,7 +414,7 @@ router.get(
 
 router.get("/logout", (req, res) => {
   res.clearCookie("connect.sid"); // This logs out the user.
-  res.clearCookie("jwttoken"); // This logs out the user.
+  res.clearCookie("jwtToken"); // This logs out the user.
 
   res.redirect("/");
 });
