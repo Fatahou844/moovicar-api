@@ -30,6 +30,7 @@ const notificationsRoutes = require("./routes/notifications.routes");
 const reservationsRoutes = require("./routes/reservation.routes");
 const conversationsRoutes = require("./routes/conversation.routes");
 const reservationsGainRoutes = require("./routes/reservationGain.routes");
+const askupdateresa = require("./routes/askupdatereservation.routes.js");
 const localMiddlewareAuth = require("./middlewares/localMiddleware");
 const googleMiddlewareAuth = require("./middlewares/googleMiddleware");
 const stripeMiddleware = require("./middlewares/stripeMiddleware.js");
@@ -75,10 +76,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      sameSite: "None", // Nécessaire pour permettre les cookies cross-domain
+      sameSite: "Lax", // Nécessaire pour permettre les cookies cross-domain
       httpOnly: false,
       secure: false,
-      domain: "app.moovicar.com", // Protège le cookie d'un accès JavaScript
+      // domain: "app.moovicar.com", // Protège le cookie d'un accès JavaScript
       maxAge: 24 * 60 * 60 * 1000, // Durée de vie du cookie (1 jour, par exemple)
     },
   })
@@ -144,7 +145,7 @@ app.db.sequelize
 // Active le middleware cors pour toutes les routes
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -215,8 +216,7 @@ app.use("/api/paiements", paiementsRoutes);
 app.use("/api", localMiddlewareAuth);
 app.use("/api/auth/google", googleMiddlewareAuth);
 app.use("/api/stripe", stripeMiddleware);
-
-app.use(express.static(path.join(__dirname, "public")));
+app.use("/api/askupdateresa", askupdateresa);
 
 app.post("/api/access-authorisation", (req, res) => {
   const authHeader = req.headers["authorization"];
@@ -350,9 +350,14 @@ app.get("/api/details", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.use(express.static(path.join(__dirname, "public")));
+
+// app.get("*", (req, res) => {
+//   req.lang = req.params.lang;
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });
 
 app.get("*", (req, res) => {
-  req.lang = req.params.lang;
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 

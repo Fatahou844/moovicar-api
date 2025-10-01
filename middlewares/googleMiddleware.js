@@ -135,9 +135,9 @@ router.get(
     const token = jwt.sign({ sub: req.user.email }, jwtOptions.secretOrKey);
     res.cookie("jwtToken", token, {
       maxAge: 86400 * 1000,
-      domain: ".app.moovicar.com",
+      // domain: ".app.moovicar.com",
       path: "/",
-      secure: true,
+      secure: false,
       httpOnly: false,
       sameSite: "Lax",
     });

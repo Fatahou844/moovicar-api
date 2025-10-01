@@ -160,7 +160,7 @@ router.post("/login", function (req, res, next) {
         path: "/",
         secure: false,
         httpOnly: false,
-        // sameSite: "Lax",
+        sameSite: "Lax",
       });
       return res.status(200).json({ success: true }); // Connexion réussie
     });

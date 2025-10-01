@@ -30,6 +30,8 @@ exports.getConversations = function (req, res) {
           "status",
           "driverInviteId",
           "driverHoteId",
+          "startDate",
+          "endDate",
         ],
         include: [
           {
@@ -124,6 +126,8 @@ exports.getConversationByReservationId = function (req, res) {
           "status",
           "driverInviteId",
           "driverHoteId",
+          "startDate",
+          "endDate",
         ],
         include: [
           {
@@ -198,6 +202,8 @@ exports.getConversationByGroupByReservationId = function (req, res) {
           "status",
           "driverInviteId",
           "driverHoteId",
+          "startDate",
+          "endDate",
         ],
         include: [
           {

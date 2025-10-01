@@ -4515,3 +4515,48 @@
   label: 'winston veritatrust format',
   timestamp: 'Apr-22-2025 09:01:10'
 }
+{
+  name: 'SequelizeConnectionError',
+  parent: Error: Got timeout reading communication packets
+      at Packet.asError (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\packets\packet.js:728:17)
+      at ClientHandshake.execute (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\commands\command.js:29:26)
+      at Connection.handlePacket (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:481:34)
+      at PacketParser.onPacket (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:97:12)
+      at PacketParser.executeStart (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\packet_parser.js:75:16)
+      at Socket.<anonymous> (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:104:25)
+      at Socket.emit (node:events:519:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NET_READ_INTERRUPTED',
+    errno: 1159,
+    sqlState: '08S01',
+    sqlMessage: 'Got timeout reading communication packets',
+    sql: undefined
+  },
+  original: Error: Got timeout reading communication packets
+      at Packet.asError (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\packets\packet.js:728:17)
+      at ClientHandshake.execute (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\commands\command.js:29:26)
+      at Connection.handlePacket (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:481:34)
+      at PacketParser.onPacket (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:97:12)
+      at PacketParser.executeStart (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\packet_parser.js:75:16)
+      at Socket.<anonymous> (C:\Users\21266\Desktop\MyCar\moovicar-express-api\node_modules\mysql2\lib\connection.js:104:25)
+      at Socket.emit (node:events:519:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5) {
+    code: 'ER_NET_READ_INTERRUPTED',
+    errno: 1159,
+    sqlState: '08S01',
+    sqlMessage: 'Got timeout reading communication packets',
+    sql: undefined
+  },
+  level: 'error',
+  message: 'Error while finding user: Got timeout reading communication packets',
+  stack: 'SequelizeConnectionError: Got timeout reading communication packets\n' +
+    '    at ConnectionManager.connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\mysql\\connection-manager.js:102:17)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async ConnectionManager._connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\abstract\\connection-manager.js:222:24)',
+  label: 'winston veritatrust format',
+  timestamp: 'Apr-30-2025 10:26:45'
+}
