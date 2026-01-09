@@ -4,22 +4,56 @@ const db = require("../models/index");
 const { Op } = require("sequelize");
 
 const UserProfile = db.UserProfile;
+const bcrypt = require("bcrypt");
+
+// exports.createUserProfile = async function (req, res) {
+//   UserProfile.create(req.body)
+//     .then((UserProfile) => {
+//       console.log(UserProfile);
+//       if (UserProfile) {
+//         res.status(200).json(UserProfile);
+//       } else {
+//         res.status(400).json(-1);
+//       }
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//       console.log("modeleId from request:", req.body);
+//       res.status(500).json({ error: "UserProfiles Internal server error" });
+//     });
+// };
 
 exports.createUserProfile = async function (req, res) {
-  UserProfile.create(req.body)
-    .then((UserProfile) => {
-      console.log(UserProfile);
-      if (UserProfile) {
-        res.status(200).json(UserProfile);
-      } else {
-        res.status(400).json(-1);
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log("modeleId from request:", req.body);
-      res.status(500).json({ error: "UserProfiles Internal server error" });
+  try {
+    const { password, ...rest } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required" });
+    }
+
+    // 🔐 Hash du mot de passe
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const userProfile = await UserProfile.create({
+      ...rest,
+      password: hashedPassword,
     });
+
+    if (!userProfile) {
+      return res.status(400).json(-1);
+    }
+
+    // ⚠️ Ne JAMAIS renvoyer le password (même hashé)
+    const userResponse = userProfile.toJSON();
+    delete userResponse.password;
+
+    res.status(200).json(userResponse);
+  } catch (error) {
+    console.error(error);
+    console.log("Payload reçu :", req.body);
+    res.status(500).json({ error: "UserProfiles Internal server error" });
+  }
 };
 
 exports.getUserProfiles = function (req, res) {
