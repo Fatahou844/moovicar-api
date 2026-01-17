@@ -9,8 +9,15 @@ const express = require("express");
 const session = require("express-session");
 const cors = require("cors"); // Importez le module cors
 const passport = require("passport");
-
+const jwt = require("jsonwebtoken");
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 const router = express.Router();
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.SECRET_SESSION_JWT,
+};
 
 passport.use(
   new BearerStrategy(function (token, done) {

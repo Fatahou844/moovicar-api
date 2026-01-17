@@ -4560,3 +4560,57 @@
   label: 'winston veritatrust format',
   timestamp: 'Apr-30-2025 10:26:45'
 }
+{
+  name: 'SequelizeHostNotFoundError',
+  parent: Error: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:120:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com',
+    fatal: true
+  },
+  original: Error: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:120:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com',
+    fatal: true
+  },
+  level: 'error',
+  message: "Erreur lors de l'annulation automatique des réservations: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com",
+  stack: 'SequelizeHostNotFoundError: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com\n' +
+    '    at ConnectionManager.connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\mysql\\connection-manager.js:96:17)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async ConnectionManager._connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\abstract\\connection-manager.js:222:24)',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-17-2026 14:36:00'
+}
+{
+  name: 'SequelizeHostNotFoundError',
+  parent: Error: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:120:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com',
+    fatal: true
+  },
+  original: Error: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:120:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com',
+    fatal: true
+  },
+  level: 'error',
+  message: "Erreur lors de l'annulation automatique des réservations: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com",
+  stack: 'SequelizeHostNotFoundError: getaddrinfo ENOTFOUND mysql-1ad82724-fatahouahamadi88-b490.i.aivencloud.com\n' +
+    '    at ConnectionManager.connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\mysql\\connection-manager.js:96:17)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async ConnectionManager._connect (C:\\Users\\21266\\Desktop\\MyCar\\moovicar-express-api\\node_modules\\sequelize\\lib\\dialects\\abstract\\connection-manager.js:222:24)',
+  label: 'winston veritatrust format',
+  timestamp: 'Jan-17-2026 14:44:00'
+}
