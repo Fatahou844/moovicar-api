@@ -30,7 +30,7 @@ passport.use(
       }
       return done(null, user, { scope: "read" });
     });
-  })
+  }),
 );
 
 passport.use(
@@ -67,7 +67,7 @@ passport.use(
                   where: {
                     email: user.email,
                   },
-                }
+                },
               )
               .then(() => {
                 console.log("Userprofile updated successfully");
@@ -87,6 +87,8 @@ passport.use(
                 googleId: profile.id,
                 email: profile.emails[0].value,
                 password: passwordValue,
+                firstName: profile.name.givenName,
+                lastName: profile.name.familyName,
                 token: accessToken,
                 verification_token: verificationToken,
                 verified: 1,
@@ -100,8 +102,8 @@ passport.use(
               });
           }
         });
-    }
-  )
+    },
+  ),
 );
 
 router.get(
@@ -122,7 +124,7 @@ router.get(
       </body>
       </html>
     `);
-  }
+  },
 );
 
 // router.get(
@@ -149,7 +151,7 @@ router.get(
       sameSite: "Lax",
     });
     res.redirect("https://app.moovicar.com/guest/listing/reservations");
-  }
+  },
 );
 
 module.exports = router;
