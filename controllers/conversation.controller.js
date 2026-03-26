@@ -54,12 +54,24 @@ exports.getConversations = function (req, res) {
               "city",
               "country",
               "immatriculation",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
             ],
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
-            attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
       },
@@ -151,12 +163,24 @@ exports.getConversationByReservationId = function (req, res) {
               "country",
               "immatriculation",
               "profile_url",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
             ],
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
-            attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
       },
@@ -226,12 +250,24 @@ exports.getConversationByGroupByReservationId = function (req, res) {
               "city",
               "country",
               "immatriculation",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
             ],
           },
           {
             model: UserProfile, // Remplacez Vehicule par le nom de votre modèle de véhicule
             as: "Invite",
-            attributes: ["id", "firstName", "lastName", "city", "country"], // Sélectionnez les attributs que vous souhaitez inclure
+            attributes: [
+              "id",
+              "firstName",
+              "lastName",
+              "city",
+              "country",
+              "PermisConduireDoc",
+              "PieceIdentityDoc",
+              "ImmatriculationDoc",
+            ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
       },

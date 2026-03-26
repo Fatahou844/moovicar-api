@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx sequelize-cli:*)",
+      "Read(//c/Users/21266/Desktop/MyCar/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdminReservationsPage"
+    ]
+  }
+}

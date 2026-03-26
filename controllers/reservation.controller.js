@@ -10,6 +10,7 @@ const UserProfile = db.UserProfile;
 const reservation = db.Reservation;
 const VehiculeAnnonce = db.VehiculeAnnonce;
 const ReservationGains = db.ReservationGains;
+const Paiements = db.Paiements;
 
 exports.getreservations = function (req, res) {
   reservation
@@ -36,6 +37,9 @@ exports.getreservations = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
         },
         {
@@ -48,6 +52,9 @@ exports.getreservations = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
 
@@ -128,6 +135,9 @@ exports.getReservationById = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
         },
         {
@@ -140,6 +150,9 @@ exports.getReservationById = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
 
@@ -204,6 +217,9 @@ exports.getReservationByDriverHoteId = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
@@ -217,6 +233,9 @@ exports.getReservationByDriverHoteId = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ], // Sélectionnez les attributs que vous souhaitez inclure
           // where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
@@ -282,6 +301,9 @@ exports.getReservationByDriverInviteId = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverInviteId") }, // Filtrer par driverHoteId
         },
@@ -295,6 +317,9 @@ exports.getReservationByDriverInviteId = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ], // Sélectionnez les attributs que vous souhaitez inclure
           // where: { id: col("reservation.driverHoteId") }, // Filtrer par driverHoteId
         },
@@ -333,40 +358,28 @@ exports.getReservationByDriverInviteId = function (req, res) {
     });
 };
 
-exports.updateReservation = function (req, res) {
-  const { id } = req.params; // Récupère l'ID de la réservation à mettre à jour depuis les paramètres de la requête
-  const updateData = req.body; // Récupère les données de mise à jour depuis le corps de la requête
+exports.updateReservation = async function (req, res) {
+  const { id } = req.params;
+  const updateData = req.body;
 
-  // Recherche la réservation par son ID et met à jour les données
-  reservation
-    .update(updateData, {
-      where: { reservationId: id }, // Spécifiez la condition pour la mise à jour
-    })
-    .then((rowsUpdated) => {
-      // Vérifie si des lignes ont été mises à jour avec succès
-      if (rowsUpdated > 0) {
-        // Si la mise à jour est réussie, renvoie les réservations mises à jour
-        reservation
-          .findOne({ where: { reservationId: id } })
-          .then((updatedReservation) => {
-            res.status(200).json(updatedReservation);
-          })
-          .catch((error) => {
-            console.error(error);
-            res
-              .status(500)
-              .json({ error: "Error fetching updated reservation" });
-          });
-      } else {
-        // Si l'ID fourni ne correspond à aucune réservation dans la base de données, renvoie une réponse avec un code d'état 404 (Non trouvé)
-        res.status(404).json({ error: "Reservation not found" });
-      }
-    })
-    .catch((error) => {
-      // Gère les erreurs potentielles
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+  try {
+    const [rowsUpdated] = await reservation.update(updateData, {
+      where: { reservationId: id },
     });
+
+    if (rowsUpdated === 0) {
+      return res.status(404).json({ error: "Reservation not found" });
+    }
+
+    const updatedReservation = await reservation.findOne({
+      where: { reservationId: id },
+    });
+
+    return res.status(200).json(updatedReservation);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 exports.getReservationByDriverInviteIdAndDates = function (req, res) {
@@ -398,6 +411,9 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverInviteId") },
         },
@@ -411,6 +427,9 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverHoteId") },
         },
@@ -479,6 +498,9 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "country",
             "immatriculation",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverInviteId") },
         },
@@ -492,6 +514,9 @@ exports.getReservationByDriverInviteIdAndDates = function (req, res) {
             "city",
             "country",
             "profile_url",
+            "PermisConduireDoc",
+            "PieceIdentityDoc",
+            "ImmatriculationDoc",
           ],
           // where: { id: col("reservation.driverHoteId") },
         },
@@ -540,7 +565,7 @@ exports.updateReservationsByDriverInviteIdAndDates = function (req, res) {
   reservation
     .update(
       {
-        status: "2",
+        status: "rejected",
       },
       {
         where: {
@@ -549,16 +574,12 @@ exports.updateReservationsByDriverInviteIdAndDates = function (req, res) {
           endDate: new Date(endDate),
           reservationId: { [Op.ne]: reservationIdToExclude },
         },
-      }
+      },
     )
     .then((result) => {
-      if (result > 0) {
-        res
-          .status(200)
-          .json({ message: `${result} reservations updated successfully` });
-      } else {
-        res.status(404).json({ message: "No reservations found to update" });
-      }
+      res
+        .status(200)
+        .json({ message: `${result} reservations updated successfully` });
     })
     .catch((error) => {
       console.error(error);

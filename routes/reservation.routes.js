@@ -19,7 +19,7 @@ router.get("/getbydriverid/:driverHoteId", getReservationByDriverHoteId);
 router.get("/getbyInviteid/:driverInviteId", getReservationByDriverInviteId);
 router.put(
   "/updatebyInviteidDates/:driverInviteId",
-  updateReservationsByDriverInviteIdAndDates
+  updateReservationsByDriverInviteIdAndDates,
 );
 
 //getReservationByDriverHoteId

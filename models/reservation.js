@@ -43,15 +43,67 @@ module.exports = (sequelize, DataTypes) => {
       startEmplacement: DataTypes.STRING,
       endEmplacement: DataTypes.STRING,
       status: {
-        type: DataTypes.ENUM("0", "1", "2", "3", "4"),
-        defaultValue: "0",
+        type: DataTypes.ENUM(
+          // ─────────────
+          // 1️⃣ DEMANDE
+          // ─────────────
+          "pending", // demande envoyée
+          "accepted", // acceptée par propriétaire
+          "rejected", // refusée
+          "cancelled", // annulée avant paiement
+
+          // ─────────────
+          // 2️⃣ PAIEMENT
+          // ─────────────
+          "paid", // paiement validé
+          "payment_failed", // paiement refusé
+
+          // ─────────────
+          // 3️⃣ CHECK-IN
+          // ─────────────
+          "checkin_pending_validation", // conducteur a soumis
+          "checkin_refused", // refus propriétaire
+
+          // ─────────────
+          // 4️⃣ LOCATION ACTIVE
+          // ─────────────
+          "in_progress", // location démarrée
+          "issue_reported", // problème signalé
+
+          // ─────────────
+          // 5️⃣ CHECK-OUT
+          // ─────────────
+          "completed_checkout", // retour soumis
+          "checkout_refused", // refus retour
+
+          // ─────────────
+          // 6️⃣ FIN & LITIGE
+          // ─────────────
+          "completed", // retour validé
+          "dispute_open", // litige ouvert
+          "dispute_resolved", // litige clôturé
+
+          // ─────────────
+          // 7️⃣ CLÔTURE
+          // ─────────────
+          "closed", // transaction finalisée
+          "refunded", // remboursement effectué
+          "partially_refunded",
+        ),
+        defaultValue: "pending",
+        allowNull: false,
       },
       PaymentIntentId: DataTypes.STRING,
+      isPaidOut: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      payoutId: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: "Reservation",
-    }
+    },
   );
   return Reservation;
 };

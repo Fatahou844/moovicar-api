@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models/index");
 const userprofile = db.UserProfile;
+const Paiements = db.Paiements;
 const jwt = require("jsonwebtoken");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
@@ -56,12 +57,114 @@ passport.use(
   })
 );
 
+// DEV ONLY — Active un compte connecté test sans passer par l'onboarding
+router.post("/activate-test-account/:stripeAccountId", async (req, res) => {
+  try {
+    const { stripeAccountId } = req.params;
+
+    // 1️⃣ Créer un account token avec toutes les infos KYC
+    const accountToken = await stripe.tokens.create({
+      account: {
+        business_type: "individual",
+        individual: {
+          first_name: "Test",
+          last_name: "User",
+          email: "test@example.com",
+          dob: { day: 1, month: 1, year: 1990 },
+          address: {
+            line1: "1 rue de la Paix",
+            city: "Paris",
+            postal_code: "75001",
+            country: "FR",
+          },
+          id_number: "000000000",
+          phone: "+33600000000",
+        },
+        tos_shown_and_accepted: true,
+      },
+    });
+
+    // 2️⃣ Mettre à jour le compte avec le token + business_profile
+    const account = await stripe.accounts.update(stripeAccountId, {
+      account_token: accountToken.id,
+      business_profile: {
+        url: "https://moovicar.com",
+        mcc: "7512",
+      },
+    });
+
+    res.json({
+      id: account.id,
+      capabilities: account.capabilities,
+      payouts_enabled: account.payouts_enabled,
+      charges_enabled: account.charges_enabled,
+      requirements: account.requirements.currently_due,
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Diagnostiquer l'état d'un compte connecté (capabilities + requirements)
+router.get("/account-status/:stripeAccountId", async (req, res) => {
+  try {
+    const account = await stripe.accounts.retrieve(req.params.stripeAccountId);
+    res.json({
+      id: account.id,
+      capabilities: account.capabilities,
+      requirements: {
+        currently_due: account.requirements.currently_due,
+        eventually_due: account.requirements.eventually_due,
+        pending_verification: account.requirements.pending_verification,
+        disabled_reason: account.requirements.disabled_reason,
+      },
+      charges_enabled: account.charges_enabled,
+      payouts_enabled: account.payouts_enabled,
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Récupérer les détails d'un PaymentIntent depuis Stripe
+router.get("/payment-intent/:id", async (req, res) => {
+  try {
+    const pi = await stripe.paymentIntents.retrieve(req.params.id, {
+      expand: ["charges.data.payment_method_details"],
+    });
+    res.json(pi);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Rembourser un locataire via paymentIntentId
+router.post("/refund", async (req, res) => {
+  const { paymentIntentId, amount, reason, paiementId } = req.body;
+  try {
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      ...(amount && { amount: Math.round(parseFloat(amount) * 100) }),
+      reason, // "requested_by_customer" | "duplicate" | "fraudulent"
+    });
+    if (paiementId) {
+      await Paiements.update(
+        { paiementStatus: "4", refundId: refund.id },
+        { where: { id: paiementId } },
+      );
+    }
+    res.json({ refundId: refund.id });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // Transfert de fonds à un compte connecté
 router.post(
   "/transfer-funds",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
-    const { email, amount } = req.body;
+    const { email, amount, paymentIntentId, paiementId } = req.body;
     try {
       const user = await userprofile.findOne({ where: { email } });
       if (!user) {
@@ -69,7 +172,7 @@ router.post(
       }
 
       const transfer = await stripe.transfers.create({
-        amount: amount * 100,
+        amount: Math.round(parseFloat(amount) * 100),
         currency: "eur",
         destination: user.stripeAccountId,
       });
@@ -77,9 +180,22 @@ router.post(
       res.send({ transferId: transfer.id, source_type: transfer.source_type });
     } catch (error) {
       logger.error("Erreur lors du transfert des fonds:", error);
-      res.status(500).send(error);
+
+      /* Marquer le paiement comme échoué en base si on connaît l'id */
+      if (paiementId) {
+        try {
+          await Paiements.update(
+            { paiementStatus: "2", notes: `Échec virement manuel : ${error.message}` },
+            { where: { id: paiementId } },
+          );
+        } catch (dbErr) {
+          logger.error("Impossible de mettre à jour le statut du paiement:", dbErr.message);
+        }
+      }
+
+      res.status(500).send({ error: error.message });
     }
-  }
+  },
 );
 
 router.post(

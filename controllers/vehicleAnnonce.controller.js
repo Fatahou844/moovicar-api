@@ -30,6 +30,9 @@ exports.getVehiculeAnnonces = function (req, res) {
           "lateralPhotos",
           "interiorPhotos",
           "IsUtilitaire",
+          "CertificatImmatriculationDoc",
+          "AssuranceDoc",
+          "ControleTechniqueDoc",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -50,6 +53,7 @@ exports.getVehiculeAnnonces = function (req, res) {
               "EngagementRate",
               "EvaluationNumber",
               "Finalizedtrips",
+              "email",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -82,7 +86,7 @@ exports.createVehiculeAnnonce = function (req, res) {
             req.body.EmailData.nom,
             req.body.EmailData.prenom,
             req.body.EmailData.Linkurl,
-            req.body.EmailData.email
+            req.body.EmailData.email,
           );
         };
         fetchSendEmail();
@@ -126,6 +130,9 @@ exports.getVehiculeAnnonceById = function (req, res) {
           "ControleTechnique",
           "AutorizationProprietaire",
           "IsUtilitaire",
+          "CertificatImmatriculationDoc",
+          "AssuranceDoc",
+          "ControleTechniqueDoc",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -147,6 +154,7 @@ exports.getVehiculeAnnonceById = function (req, res) {
               "EngagementRate",
               "EvaluationNumber",
               "Finalizedtrips",
+              "email",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -199,6 +207,9 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
           "ControleTechnique",
           "AutorizationProprietaire",
           "IsUtilitaire",
+          "CertificatImmatriculationDoc",
+          "AssuranceDoc",
+          "ControleTechniqueDoc",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -221,6 +232,7 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
               "EngagementRate",
               "EvaluationNumber",
               "Finalizedtrips",
+              "email",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
         ],
@@ -248,7 +260,7 @@ exports.getVehiculeAnnonceByVehiculeId = function (req, res) {
 exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
   const centerLatitude = req.query.latitude;
   const centerLongitude = req.query.longitude;
-  const radius = 20;
+  const radius = 100;
 
   VehiculeAnnonce.findAll({
     include: [
@@ -266,6 +278,9 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
           "userId",
           "kilometrage",
           "IsUtilitaire",
+          "CertificatImmatriculationDoc",
+          "AssuranceDoc",
+          "ControleTechniqueDoc",
         ], // Sélectionnez les attributs que vous souhaitez inclure
         include: [
           {
@@ -282,6 +297,7 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
               "EngagementRate",
               "EvaluationNumber",
               "Finalizedtrips",
+              "email",
             ], // Sélectionnez les attributs que vous souhaitez inclure
           },
           {
@@ -292,7 +308,7 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
       },
     ],
     where: literal(
-      `6371 * acos(cos(radians(${centerLatitude})) * cos(radians(SUBSTRING_INDEX(locationCoordinates, ',', 1))) * cos(radians(SUBSTRING_INDEX(locationCoordinates, ',', -1)) - radians(${centerLongitude})) + sin(radians(${centerLatitude})) * sin(radians(SUBSTRING_INDEX(locationCoordinates, ',', 1)))) < ${radius}`
+      `6371 * acos(cos(radians(${centerLatitude})) * cos(radians(SUBSTRING_INDEX(locationCoordinates, ',', 1))) * cos(radians(SUBSTRING_INDEX(locationCoordinates, ',', -1)) - radians(${centerLongitude})) + sin(radians(${centerLatitude})) * sin(radians(SUBSTRING_INDEX(locationCoordinates, ',', 1)))) < ${radius}`,
     ),
   })
     .then((result) => {

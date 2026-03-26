@@ -38,6 +38,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      password_reset_token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      password_reset_expires: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
       phoneNumber: DataTypes.STRING,
       city: DataTypes.STRING,
       country: DataTypes.STRING,
@@ -57,6 +65,8 @@ module.exports = (sequelize, DataTypes) => {
       ExpertVitesseManuelle: DataTypes.BOOLEAN,
       stripeCustomerId: DataTypes.STRING,
       stripeAccountId: DataTypes.STRING,
+      stripeBankAccountId: DataTypes.STRING,
+      bankLast4: DataTypes.STRING,
       last4: DataTypes.STRING,
       exp_month: DataTypes.STRING,
       exp_year: DataTypes.STRING,
@@ -67,7 +77,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "UserProfile",
-    }
+    },
   );
   return UserProfile;
 };

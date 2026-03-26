@@ -8,6 +8,7 @@ const VehicleModel = db.VehicleModel;
 const UserProfile = db.UserProfile;
 const reservation = db.Reservation;
 const ReservationGains = db.ReservationGains;
+const Paiements = db.Paiements;
 
 exports.getReservationGainss = function (req, res) {
   ReservationGains.findAll({
@@ -78,26 +79,44 @@ exports.getReservationGainss = function (req, res) {
 };
 
 exports.createReservationGains = async function (req, res) {
-  ReservationGains.create(req.body)
-    .then((reserv) => {
-      console.log(reserv);
-      if (reserv) {
-        const reservationId = reserv.reservationId;
-        const SocketReservationId = req.userConnections[reservationId];
+  try {
+    const reserv = await ReservationGains.create(req.body);
 
-        if (reservationId) {
-          req.io.emit("ReservationGains", reserv);
-        }
-        res.status(200).json(reserv);
-      } else {
-        res.status(400).json(-1);
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log("modeleId from request:", req.body);
-      res.status(500).json({ error: "reservations Internal server error" });
+    if (reserv.reservationId) {
+      req.io.emit("ReservationGains", reserv);
+    }
+
+    // Créer la ligne Paiement liée à ce gain
+    const resa = await reservation.findOne({
+      where: { reservationId: reserv.reservationId },
     });
+
+    if (resa) {
+      const existingPaiement = await Paiements.findOne({
+        where: { reservationId: reserv.reservationId },
+      });
+
+      if (!existingPaiement) {
+        await Paiements.create({
+          reservationId: reserv.reservationId,
+          userId: resa.driverInviteId,
+          amount: parseFloat(reserv.amount),
+          paymentIntentId: resa.PaymentIntentId || null,
+          paiementStatus: "0",
+          paiement_method: "card",
+          paiementData: new Date(),
+          TransactionDate: new Date(),
+        });
+      }
+    }
+
+    return res.status(200).json(reserv);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ error: "reservations Internal server error" });
+  }
 };
 
 exports.getReservationGainsByReservationId = function (req, res) {

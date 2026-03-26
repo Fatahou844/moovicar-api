@@ -51,18 +51,21 @@ module.exports = (sequelize, DataTypes) => {
         "2013",
         "2012",
         "2011",
-        "2010"
+        "2010",
       ),
       CertificatImmatriculation: DataTypes.BOOLEAN,
       Assurance: DataTypes.BOOLEAN,
       ControleTechnique: DataTypes.BOOLEAN,
       AutorizationProprietaire: DataTypes.BOOLEAN,
       IsUtilitaire: DataTypes.BOOLEAN,
+      CertificatImmatriculationDoc: DataTypes.STRING(2048),
+      AssuranceDoc: DataTypes.STRING(2048),
+      ControleTechniqueDoc: DataTypes.STRING(2048),
     },
     {
       sequelize,
       modelName: "Vehicle",
-    }
+    },
   );
   return Vehicle;
 };

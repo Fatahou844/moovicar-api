@@ -3,6 +3,8 @@ const uuid = require("uuid");
 const Op = require("sequelize").Op;
 const db = require("../models/index");
 const userprofile = db.UserProfile;
+const Reservation = db.Reservation;
+const Transaction = db.Transaction;
 const MoovicarUsers = db.MoovicarUsers;
 const jwt = require("jsonwebtoken");
 const JwtStrategy = require("passport-jwt").Strategy;
@@ -14,6 +16,11 @@ const express = require("express");
 const dotenv = require("dotenv");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const { getPaiementsByUser } = require("../controllers/paiements.controller");
+const { sendVerificationEmail } = require("../utils/emailService");
+const {
+  requestPasswordReset,
+  resetPassword,
+} = require("../controllers/auth.controller");
 
 dotenv.config();
 
@@ -50,8 +57,8 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-    }
-  )
+    },
+  ),
 );
 
 passport.use(
@@ -85,8 +92,8 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-    }
-  )
+    },
+  ),
 );
 
 const jwtOptions = {
@@ -114,7 +121,7 @@ passport.use(
       logger.error("Error while finding user:", err);
       return done(err, false);
     }
-  })
+  }),
 );
 
 // Stratégie spécifique pour les admins
@@ -138,7 +145,7 @@ passport.use(
       logger.error("Error while finding admin:", err);
       return done(err, false);
     }
-  })
+  }),
 );
 
 router.post("/login", function (req, res, next) {
@@ -206,6 +213,8 @@ router.post("/data/user-data", async (req, res, next) => {
       verification_token: verificationToken,
     });
 
+    await sendVerificationEmail(newUser, verificationToken);
+
     req.login(newUser, (err) => {
       if (err) {
         return next(err);
@@ -228,7 +237,7 @@ router.get("/verify", (req, res) => {
         where: {
           verification_token: req.query.token,
         },
-      }
+      },
     )
     .then(() => {
       logger.info("Userprofile updated successfully");
@@ -239,6 +248,12 @@ router.get("/verify", (req, res) => {
 
   res.redirect("/");
 });
+
+// page "forgot password"
+router.post("/forgot-password", requestPasswordReset);
+
+// reset password (token en query comme ton /verify)
+router.post("/reset-password", resetPassword);
 //
 router.get(
   "/",
@@ -246,7 +261,27 @@ router.get(
   (req, res) => {
     // Query the database to retrieve user data
     userprofile
-      .findOne({ where: { email: req.user.email } })
+      .findOne({
+        where: { email: req.user.email },
+        attributes: {
+          exclude: [
+            "password",
+            "verification_token",
+            "token",
+            "password_reset_token",
+            "password_reset_expires",
+            "googleId",
+            "facebookId",
+            "OpenID",
+            "stripeCustomerId",
+            "stripeAccountId",
+            "access_tokenPaypal",
+            "last4",
+            "exp_month",
+            "exp_year",
+          ],
+        },
+      })
       .then((user) => {
         if (!user) {
           res.send(null);
@@ -259,7 +294,7 @@ router.get(
       .catch((err) => {
         res.send(null);
       });
-  }
+  },
 );
 
 router.get(
@@ -267,13 +302,13 @@ router.get(
   passport.authenticate("user-jwt", { session: false }),
   (req, res) => {
     res.json({ isAuthenticated: true });
-  }
+  },
 );
 
 // Création d'un client Stripe et mise à jour de la base de données
 router.post(
   "/create-customer",
-  passport.authenticate("userprofile", { session: false }),
+  passport.authenticate("user-jwt", { session: false }),
   async (req, res) => {
     const { email } = req.body;
     try {
@@ -292,60 +327,204 @@ router.post(
       logger.error("Erreur lors de la création du client:", error);
       res.status(500).send(error);
     }
-  }
+  },
 );
 
 // Création d'un compte connecté Stripe et mise à jour de la base de données
+// router.post(
+//   "/create-connected-account",
+//   passport.authenticate("user-jwt", { session: false }),
+//   async (req, res) => {
+//     const { email } = req.body;
+//     try {
+//       // 1. Créer un token de compte
+//       const accountToken = await stripe.tokens.create({
+//         account: {
+//           business_type: "individual", // Spécifiez le type de business ici
+//           individual: {
+//             email: email,
+//             // Ajoutez ici d'autres informations nécessaires sur l'utilisateur
+//             // par exemple: first_name, last_name, etc.
+//           },
+//           tos_shown_and_accepted: true,
+//         },
+//       });
+
+//       // 2. Utiliser ce token pour créer le compte connecté
+//       const account = await stripe.accounts.create({
+//         type: "custom",
+//         country: "FR",
+//         account_token: accountToken.id,
+//         capabilities: {
+//           card_payments: { requested: true },
+//           transfers: { requested: true },
+//         },
+//       });
+
+//       const user = await userprofile.findOne({ where: { email } });
+
+//       if (user) {
+//         user.stripeAccountId = account.id;
+//         await user.save();
+//       } else {
+//         return res.status(404).send({ error: "User not found" });
+//       }
+
+//       res.send(user);
+//     } catch (error) {
+//       logger.error("Erreur lors de la création du compte connecté:", error);
+//       res.status(500).send(error);
+//     }
+//   },
+// );
+
 router.post(
   "/create-connected-account",
-  passport.authenticate("userprofile", { session: false }),
+  passport.authenticate("user-jwt", { session: false }),
   async (req, res) => {
-    const { email } = req.body;
     try {
-      // 1. Créer un token de compte
+      const user = await userprofile.findOne({
+        where: { id: req.user.id },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: "Utilisateur introuvable" });
+      }
+
+      // 1️⃣ Créer un account token (obligatoire pour plateformes FR)
       const accountToken = await stripe.tokens.create({
         account: {
-          business_type: "individual", // Spécifiez le type de business ici
           individual: {
-            email: email,
-            // Ajoutez ici d'autres informations nécessaires sur l'utilisateur
-            // par exemple: first_name, last_name, etc.
+            first_name: user.firstName || "Prénom",
+            last_name: user.lastName || "Nom",
+            email: user.email,
           },
+          business_type: "individual",
           tos_shown_and_accepted: true,
         },
       });
 
-      // 2. Utiliser ce token pour créer le compte connecté
+      // 2️⃣ Créer un compte Stripe Custom avec le token
       const account = await stripe.accounts.create({
         type: "custom",
         country: "FR",
+        email: user.email,
         account_token: accountToken.id,
         capabilities: {
-          card_payments: { requested: true },
           transfers: { requested: true },
         },
       });
 
-      const user = await userprofile.findOne({ where: { email } });
+      // 3️⃣ Sauvegarder l'id Stripe
+      user.stripeAccountId = account.id;
+      await user.save();
 
-      if (user) {
-        user.stripeAccountId = account.id;
-        await user.save();
-      } else {
-        return res.status(404).send({ error: "User not found" });
+      // 4️⃣ Créer le lien d'onboarding Stripe
+      const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: "http://localhost:3000/stripe/refresh",
+        return_url: "https://localhost:3000/stripe/success",
+        type: "account_onboarding",
+      });
+
+      res.json({
+        stripeAccountId: account.id,
+        onboardingUrl: accountLink.url,
+      });
+    } catch (error) {
+      logger.error("Erreur création compte Stripe:", error);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
+
+// Transférer de l'argent vers le compte bancaire d'un propriétaire
+// Body: { amount, currency, destinationUserId, description }
+router.post(
+  "/transfer-to-owner",
+  passport.authenticate("user-jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const {
+        amount,
+        currency = "eur",
+        destinationUserId,
+        reservationId,
+        description,
+      } = req.body;
+
+      if (!amount || !destinationUserId) {
+        return res
+          .status(400)
+          .json({ error: "amount et destinationUserId sont requis" });
       }
 
-      res.send(user);
+      const owner = await userprofile.findOne({
+        where: { id: destinationUserId },
+      });
+
+      if (!owner) {
+        return res.status(404).json({ error: "Propriétaire introuvable" });
+      }
+
+      if (!owner.stripeAccountId) {
+        return res
+          .status(400)
+          .json({ error: "Le propriétaire n'a pas de compte Stripe connecté" });
+      }
+
+      // Transférer depuis le solde de la plateforme vers le compte connecté
+      const transfer = await stripe.transfers.create({
+        amount: Math.round(amount * 100), // en centimes
+        currency,
+        destination: owner.stripeAccountId,
+        description:
+          description || `Paiement location - propriétaire ${owner.id}`,
+      });
+
+      // Déclencher manuellement le virement vers l'IBAN
+      const payout = await stripe.payouts.create(
+        {
+          amount: Math.round(amount * 100),
+          currency,
+        },
+        {
+          stripeAccount: owner.stripeAccountId,
+        },
+      );
+
+      await Transaction.create({
+        type: "payout",
+        reservationId: reservationId || null,
+        hostId: owner.id,
+        amount,
+        currency,
+        stripeTransferId: transfer.id,
+        stripePayoutId: payout.id,
+        status: payout.status === "paid" ? "paid" : "pending",
+        arrivalDate: payout.arrival_date
+          ? new Date(payout.arrival_date * 1000)
+          : null,
+      });
+
+      res.json({
+        transferId: transfer.id,
+        payoutId: payout.id,
+        amount,
+        currency,
+        status: payout.status,
+        arrivalDate: new Date(payout.arrival_date * 1000).toISOString(),
+      });
     } catch (error) {
-      logger.error("Erreur lors de la création du compte connecté:", error);
-      res.status(500).send(error);
+      logger.error("Erreur transfert vers propriétaire:", error);
+      res.status(500).json({ error: error.message });
     }
-  }
+  },
 );
 
 router.post(
   "/add-card",
-  passport.authenticate("userprofile", { session: false }),
+  passport.authenticate("user-jwt", { session: false }),
   async (req, res) => {
     const { email, token } = req.body;
     try {
@@ -370,7 +549,7 @@ router.post(
       logger.error("Erreur lors de l'ajout de la carte:", error);
       res.status(500).send(error);
     }
-  }
+  },
 );
 
 //
@@ -399,7 +578,7 @@ router.get(
       .catch((err) => {
         res.send(null);
       });
-  }
+  },
 );
 
 //
@@ -409,7 +588,7 @@ router.get(
   passport.authenticate("admin-jwt", { session: false }),
   (req, res) => {
     res.json({ isAuthenticated: true });
-  }
+  },
 );
 
 router.get("/logout", (req, res) => {
@@ -419,63 +598,342 @@ router.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-router.post("/create-connected-account", async (req, res) => {
-  const { email, account_holder_name, account_holder_type, iban } = req.body;
+// router.post("/create-connected-account", async (req, res) => {
+//   const { email, account_holder_name, account_holder_type, iban } = req.body;
 
+//   try {
+//     // Créer un compte connecté
+//     const account = await stripe.accounts.create({
+//       type: "custom",
+//       country: "DE", // Le pays du compte bancaire
+//       email: email,
+//       business_type: "individual", // ou 'company' selon le cas
+//       individual: {
+//         first_name: account_holder_name.split(" ")[0],
+//         last_name: account_holder_name.split(" ")[1],
+//         email: email,
+//       },
+//       business_profile: {
+//         mcc: "5734", // Code MCC, ajustez selon votre besoin
+//         product_description: "Custom Transfers",
+//       },
+//       capabilities: {
+//         transfers: { requested: true },
+//       },
+//     });
+
+//     if (!account || !account.id) {
+//       throw new Error("Failed to create a connected account.");
+//     }
+
+//     // Ajouter un compte bancaire au compte connecté
+//     const bankAccount = await stripe.accounts.createExternalAccount(
+//       "acct_1032D82eZvKYlo2C",
+//       {
+//         external_account: "btok_1NAiJy2eZvKYlo2Cnh6bIs9c",
+//       },
+//     );
+
+//     if (!bankAccount || !bankAccount.id) {
+//       throw new Error(
+//         "Failed to add the bank account to the connected account.",
+//       );
+//     }
+
+//     res.json({
+//       success: true,
+//       accountId: account.id,
+//       bankAccountId: bankAccount.id,
+//     });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ success: false, error: error.message });
+//   }
+// });
+
+// POST /reservation/payout
+router.post("/reservation/payout", async (req, res) => {
   try {
-    // Créer un compte connecté
-    const account = await stripe.accounts.create({
-      type: "custom",
-      country: "DE", // Le pays du compte bancaire
-      email: email,
-      business_type: "individual", // ou 'company' selon le cas
-      individual: {
-        first_name: account_holder_name.split(" ")[0],
-        last_name: account_holder_name.split(" ")[1],
-        email: email,
-      },
-      business_profile: {
-        mcc: "5734", // Code MCC, ajustez selon votre besoin
-        product_description: "Custom Transfers",
-      },
-      capabilities: {
-        transfers: { requested: true },
-      },
-    });
+    const { reservationId } = req.body;
 
-    if (!account || !account.id) {
-      throw new Error("Failed to create a connected account.");
+    const reservation = await Reservation.findByPk(reservationId);
+
+    if (!reservation || !reservation.PaymentIntentId) {
+      return res.status(404).json({ error: "Réservation introuvable" });
     }
 
-    // Ajouter un compte bancaire au compte connecté
-    const bankAccount = await stripe.accounts.createExternalAccount(
-      "acct_1032D82eZvKYlo2C",
-      {
-        external_account: "btok_1NAiJy2eZvKYlo2Cnh6bIs9c",
-      }
+    if (reservation.isPaidOut) {
+      return res.status(400).json({ error: "Déjà payé" });
+    }
+
+    const account = await stripe.accounts.retrieve();
+
+    if (account.capabilities.transfers !== "active") {
+      return res.status(400).json({
+        error: "Le compte Stripe du host n'est pas encore activé",
+      });
+    }
+
+    // 1️⃣ Récupérer le PaymentIntent depuis Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      reservation.PaymentIntentId,
     );
 
-    if (!bankAccount || !bankAccount.id) {
-      throw new Error(
-        "Failed to add the bank account to the connected account."
-      );
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({
+        error: "Paiement non confirmé",
+      });
     }
+
+    const totalAmount = paymentIntent.amount_received; // en centimes
+
+    if (!totalAmount || totalAmount <= 0) {
+      return res.status(400).json({ error: "Montant invalide" });
+    }
+
+    // 2️⃣ Récupérer le host
+    const hostProfile = await userprofile.findOne({
+      where: { id: reservation.driverHoteId },
+    });
+
+    if (!hostProfile || !hostProfile.stripeAccountId) {
+      return res.status(404).json({ error: "Compte Stripe hôte introuvable" });
+    }
+
+    // --- AJOUTE CE BLOC ICI ---
+    const hostStripeAccount = await stripe.accounts.retrieve(
+      hostProfile.stripeAccountId,
+    );
+
+    console.log("Capabilities de l'HÔTE:", hostStripeAccount.capabilities);
+    console.log(
+      "Requirements de l'HÔTE:",
+      hostStripeAccount.requirements.currently_due,
+    );
+
+    if (hostStripeAccount.capabilities.transfers !== "active") {
+      return res.status(400).json({
+        error: `Le compte de l'hôte n'est pas prêt. Status transfers: ${hostStripeAccount.capabilities.transfers}`,
+        details: hostStripeAccount.requirements.currently_due, // Te dira ce qu'il manque
+      });
+    }
+    // --------------------------
+
+    // 3️⃣ Calcul 80%
+    const payoutAmount = Math.floor(totalAmount * 0.8);
+
+    // 4️⃣ Créer le transfert
+    const transfer = await stripe.transfers.create({
+      amount: payoutAmount,
+      currency: paymentIntent.currency,
+      destination: hostProfile.stripeAccountId,
+    });
+
+    // 5️⃣ Marquer comme payé
+    await reservation.update({
+      isPaidOut: true,
+      payoutId: transfer.id,
+    });
 
     res.json({
       success: true,
-      accountId: account.id,
-      bankAccountId: bankAccount.id,
+      payoutId: transfer.id,
+      paidAmount: payoutAmount,
     });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ success: false, error: error.message });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
+router.post("/reservation/refund", async (req, res) => {
+  try {
+    const { reservationId, reason, type } = req.body; // type: 'annulation', 'carburant', 'force_majeure'
+
+    const reservation = await Reservation.findByPk(reservationId);
+    if (!reservation || !reservation.PaymentIntentId) {
+      return res.status(404).json({ error: "Réservation introuvable" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      reservation.PaymentIntentId,
+    );
+    const totalAmount = paymentIntent.amount_received;
+
+    let refundAmount = 0;
+    const now = new Date();
+    const createdAt = new Date(reservation.createdAt);
+    const startDate = new Date(reservation.startDate);
+
+    // --- LOGIQUE DE CALCUL SELON MOOVICAR ---
+
+    if (type === "annulation") {
+      const diffInHoursSinceBooking = (now - createdAt) / (1000 * 60 * 60);
+      const diffInHoursBeforeStart = (startDate - now) / (1000 * 60 * 60);
+
+      if (diffInHoursSinceBooking <= 1 || diffInHoursBeforeStart >= 48) {
+        // Cas 1 & 2 : 100% Remboursement
+        refundAmount = totalAmount;
+      } else if (diffInHoursBeforeStart > 0 && diffInHoursBeforeStart < 48) {
+        // Cas 3 : Remboursement partiel (ex: 50% ou frais fixes)
+        refundAmount = Math.floor(totalAmount * 0.5);
+      } else {
+        // Cas 4 : Après le début
+        return res
+          .status(400)
+          .json({ error: "Annulation après le début : aucun remboursement." });
+      }
+    } else if (type === "carburant") {
+      // Logique carburant (ex: calcul via litres manquants envoyé dans le body)
+      const { litresManquants } = req.body;
+      refundAmount = litresManquants * 90; // 0.90€ en centimes
+    }
+
+    // --- EXECUTION DU REMBOURSEMENT SUR STRIPE ---
+    if (refundAmount > 0) {
+      const refund = await stripe.refunds.create({
+        payment_intent: reservation.PaymentIntentId,
+        amount: refundAmount, // Montant calculé en centimes
+        reason: "requested_by_customer",
+        metadata: { reason_detail: reason },
+      });
+
+      // Mettre à jour la base de données
+      await reservation.update({
+        status:
+          refundAmount === totalAmount ? "refunded" : "partially_refunded",
+        refundId: refund.id,
+      });
+
+      return res.json({ success: true, refunded: refundAmount });
+    }
+
+    res.status(400).json({ error: "Aucun montant à rembourser calculé" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/stripe/refill-balance", async (req, res) => {
+  try {
+    const charge = await stripe.charges.create({
+      amount: 5000000, // 500.00 € (en centimes)
+      currency: "eur",
+      source: "tok_bypassPending", // Token magique Stripe pour ignorer le délai de 7 jours
+      description: "Recharge immédiate du solde DISPONIBLE pour tests",
+    });
+
+    res.json({
+      success: true,
+      message: "500€ ajoutés à ton solde disponible !",
+      chargeId: charge.id,
+    });
+  } catch (error) {
+    console.error("Erreur recharge:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/delete-card", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await userprofile.findOne({ where: { email } });
+
+    if (!user || !user.stripeCustomerId) {
+      return res.status(404).json({ error: "Client introuvable" });
+    }
+
+    // 1️⃣ Récupérer les cartes
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: user.stripeCustomerId,
+      type: "card",
+    });
+
+    // 2️⃣ Détacher la carte si elle existe
+    if (paymentMethods.data.length > 0) {
+      await stripe.paymentMethods.detach(paymentMethods.data[0].id);
+    }
+
+    // 3️⃣ Nettoyer la base
+    await user.update({
+      last4: null,
+      exp_month: null,
+      exp_year: null,
+      stripeCustomerId: null, // si tu veux complètement dissocier
+    });
+
+    return res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// Attacher un IBAN au compte Stripe connecté de l'utilisateur
+router.post(
+  "/add-bank-account",
+  passport.authenticate("user-jwt", { session: false }),
+  async (req, res) => {
+    const { iban } = req.body;
+
+    if (!iban) {
+      return res.status(400).json({ error: "IBAN requis" });
+    }
+
+    try {
+      const user = await userprofile.findOne({ where: { id: req.user.id } });
+
+      if (!user) {
+        return res.status(404).json({ error: "Utilisateur introuvable" });
+      }
+
+      if (!user.stripeAccountId) {
+        return res.status(400).json({
+          error:
+            "Compte Stripe connecté introuvable. Veuillez d'abord créer votre compte Stripe.",
+        });
+      }
+
+      // 1️⃣ Créer un token bancaire depuis l'IBAN
+      const bankToken = await stripe.tokens.create({
+        bank_account: {
+          country: "FR",
+          currency: "eur",
+          account_holder_name: `${user.firstName} ${user.lastName}`,
+          account_holder_type: "individual",
+          account_number: iban,
+        },
+      });
+
+      // 2️⃣ Attacher le compte bancaire au compte Stripe connecté
+      const bankAccount = await stripe.accounts.createExternalAccount(
+        user.stripeAccountId,
+        { external_account: bankToken.id },
+      );
+
+      // 3️⃣ Sauvegarder stripeBankAccountId et bankLast4
+      await user.update({
+        stripeBankAccountId: bankAccount.id,
+        bankLast4: bankAccount.last4,
+      });
+
+      return res.json({
+        success: true,
+        stripeBankAccountId: bankAccount.id,
+        bankLast4: bankAccount.last4,
+      });
+    } catch (error) {
+      logger.error("Erreur lors de l'ajout du compte bancaire:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  },
+);
+
 router.get(
   "/paiements/:userId",
-  passport.authenticate("userprofile", { session: false }),
-  getPaiementsByUser
+  passport.authenticate("user-jwt", { session: false }),
+  getPaiementsByUser,
 );
 
 module.exports = router;

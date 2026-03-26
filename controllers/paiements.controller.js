@@ -95,10 +95,20 @@ exports.getPaiements = function (req, res) {
 };
 
 exports.updatePaiement = function (req, res) {
-  const { id } = req.params; // Récupère l'ID de la réservation à mettre à jour depuis les paramètres de la requête
-  const updateData = req.body; // Récupère les données de mise à jour depuis le corps de la requête
+  const { id } = req.params;
+  const allowed = [
+    "paiementStatus",
+    "paiement_method",
+    "transactionID",
+    "paymentIntentId",
+    "payoutId",
+    "refundId",
+    "notes",
+  ];
+  const updateData = Object.fromEntries(
+    Object.entries(req.body).filter(([k]) => allowed.includes(k)),
+  );
 
-  // Recherche la réservation par son ID et met à jour les données
   Paiements.update(updateData, {
     where: { id: id }, // Spécifiez la condition pour la mise à jour
   })

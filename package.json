@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/Fatahou844/moovicar-api#readme",
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

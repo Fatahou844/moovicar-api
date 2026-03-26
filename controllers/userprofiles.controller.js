@@ -2,9 +2,10 @@
 
 const db = require("../models/index");
 const { Op } = require("sequelize");
-
+const uuid = require("uuid");
 const UserProfile = db.UserProfile;
 const bcrypt = require("bcrypt");
+const { sendVerificationEmail } = require("../utils/emailService");
 
 // exports.createUserProfile = async function (req, res) {
 //   UserProfile.create(req.body)
@@ -34,11 +35,16 @@ exports.createUserProfile = async function (req, res) {
     // 🔐 Hash du mot de passe
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const verificationToken = uuid.v4();
 
     const userProfile = await UserProfile.create({
       ...rest,
       password: hashedPassword,
+      verification_token: verificationToken,
+      verified: false,
     });
+
+    await sendVerificationEmail(userProfile, verificationToken);
 
     if (!userProfile) {
       return res.status(400).json(-1);
@@ -57,7 +63,22 @@ exports.createUserProfile = async function (req, res) {
 };
 
 exports.getUserProfiles = function (req, res) {
-  UserProfile.findAll()
+  UserProfile.findAll({
+    attributes: {
+      exclude: [
+        "password",
+        "verification_token",
+        "token",
+        "password_reset_token",
+        "password_reset_expires",
+        "googleId",
+        "facebookId",
+        "OpenID",
+
+        "access_tokenPaypal",
+      ],
+    },
+  })
     .then((UserProfile) => {
       console.log(UserProfile);
       if (UserProfile) {
@@ -78,6 +99,20 @@ exports.getUserProfileById = function (req, res) {
   UserProfile.findOne({
     where: {
       id: UserProfile_id,
+    },
+    attributes: {
+      exclude: [
+        "password",
+        "verification_token",
+        "token",
+        "password_reset_token",
+        "password_reset_expires",
+        "googleId",
+        "facebookId",
+        "OpenID",
+
+        "access_tokenPaypal",
+      ],
     },
   })
     .then((UserProfile) => {

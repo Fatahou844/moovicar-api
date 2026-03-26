@@ -27,6 +27,7 @@ exports.getvehicles = function (req, res) {
             "profile_url",
             "AcceptanceRate",
             "EvaluationNumber",
+            "email",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
@@ -85,6 +86,7 @@ exports.getvehicleById = function (req, res) {
             "profile_url",
             "AcceptanceRate",
             "EvaluationNumber",
+            "email",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
@@ -162,6 +164,7 @@ exports.getvehicleByUserId = function (req, res) {
             "profile_url",
             "AcceptanceRate",
             "EvaluationNumber",
+            "email",
           ], // Sélectionnez les attributs que vous souhaitez inclure
         },
       ],
