@@ -131,6 +131,20 @@ const checkAndAutoCancelReservations = async () => {
       await res.save();
     }
 
+    // Condition 6: Annuler les réservations "pending" ou "accepted" dont la date de début est dépassée.
+    const expiredNewReservations = await Reservation.findAll({
+      where: {
+        status: { [Op.in]: ["pending", "accepted"] },
+        startDate: { [Op.lte]: now },
+      },
+    });
+
+    for (let res of expiredNewReservations) {
+      res.status = "cancelled";
+      await res.save();
+      logger.info(`Réservation ${res.reservationId} auto-annulée (${res.status} → cancelled, startDate dépassée)`);
+    }
+
     // Nouvelle Condition: Passer les réservations payées (statut "3") en statut "4" (Complété) si la date de fin est terminée et qu'elles ne sont pas annulées.
     const reservationsToComplete = await Reservation.findAll({
       where: {
