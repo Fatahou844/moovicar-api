@@ -2,10 +2,19 @@
   "permissions": {
     "allow": [
       "Bash(npx sequelize-cli:*)",
-      "Read(//c/Users/21266/Desktop/MyCar/**)"
+      "Read(//c/Users/21266/Desktop/MyCar/**)",
+      "Bash(xargs grep:*)"
     ],
     "additionalDirectories": [
-      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdminReservationsPage"
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdminReservationsPage",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\AnnonceItem",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\VoitureProfilePage",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\SelectedModelInput",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdvancedConfigPage",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AccountVoitures",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\VoitureAnnonce",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\MobileBottomNav",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\InboxMessagePage"
     ]
   }
 }

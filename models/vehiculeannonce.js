@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
       locationAddress: DataTypes.STRING,
       locationCoordinates: DataTypes.STRING,
       status: DataTypes.ENUM("0", "1", "2", "3"),
+      pickupTimeStart: DataTypes.STRING,   // "HH:MM" heure d'ouverture prise en charge
+      pickupTimeEnd: DataTypes.STRING,     // "HH:MM" heure de fermeture prise en charge
+      returnTimeStart: DataTypes.STRING,   // "HH:MM" heure d'ouverture retour
+      returnTimeEnd: DataTypes.STRING,     // "HH:MM" heure de fermeture retour
+      annulationPolicy: DataTypes.ENUM("flexible", "moderate", "strict"), // politique d'annulation
     },
     {
       sequelize,

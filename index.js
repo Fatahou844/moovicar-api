@@ -235,6 +235,7 @@ app.use("/api/hoteavailabilities", hoteavailabilitiesRoutes);
 app.use("/api/hoteunavailabilities", hoteunavailabilitiesRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/annonce-reports", require("./routes/annoncereport.routes"));
 app.use("/api/reservationsGain", reservationsGainRoutes);
 app.use("/api/paiements", paiementsRoutes);
 app.use("/api/admin/payout-batch", payoutBatchRoutes);
@@ -561,14 +562,88 @@ app.post("/api/seed/reservations", async (req, res) => {
 app.post("/api/refund-payment", async (req, res) => {
   const { PaymentIntentId } = req.body;
 
-  // Create a PaymentIntent with the order amount and currency
   const refund = await stripe.refunds.create({
     payment_intent: PaymentIntentId,
   });
 
-  res.send({
-    refundId: refund,
-  });
+  res.send({ refundId: refund });
+});
+
+/* ─────────────────────────────────────────────────────────────────
+   Annulation avec remboursement automatique selon politique annonce
+   POST /api/reservations/:reservationId/cancel
+   Auth : JWT (le locataire ou le propriétaire peut annuler)
+───────────────────────────────────────────────────────────────── */
+app.post("/api/reservations/:reservationId/cancel", passport.authenticate("jwt", { session: false }), async (req, res) => {
+  const { reservationId } = req.params;
+  const { computeRefund } = require("./services/refundService");
+  const logger = require("./logger");
+
+  try {
+    const reservation = await db.Reservation.findOne({
+      where: { reservationId },
+      include: [
+        {
+          model: db.VehiculeAnnonce,
+          attributes: ["annulationPolicy"],
+        },
+        {
+          model: db.Paiements,
+          required: false,
+        },
+      ],
+    });
+
+    if (!reservation) return res.status(404).json({ error: "Réservation introuvable" });
+
+    const cancellableStatuses = ["pending", "accepted", "paid"];
+    if (!cancellableStatuses.includes(reservation.status)) {
+      return res.status(400).json({ error: `Impossible d'annuler une réservation avec le statut "${reservation.status}"` });
+    }
+
+    // Chercher le paiement associé
+    const paiement = await db.Paiements.findOne({
+      where: { reservationId },
+      order: [["createdAt", "DESC"]],
+    });
+
+    let refundResult = null;
+
+    if (paiement && paiement.paymentIntentId) {
+      const policy = reservation.VehiculeAnnonce?.annulationPolicy || "moderate";
+      const { refundAmount, percentage, reason } = computeRefund(
+        policy,
+        reservation.startDate,
+        Math.round(parseFloat(paiement.amount) * 100), // en centimes
+      );
+
+      if (refundAmount > 0) {
+        const stripeRefund = await stripe.refunds.create({
+          payment_intent: paiement.paymentIntentId,
+          amount: refundAmount,
+        });
+
+        await paiement.update({
+          refundId: stripeRefund.id,
+          paiementStatus: "2", // remboursé
+          notes: reason,
+        });
+
+        refundResult = { percentage, reason, refundAmount: refundAmount / 100, stripeRefundId: stripeRefund.id };
+      } else {
+        refundResult = { percentage: 0, reason, refundAmount: 0 };
+      }
+    }
+
+    await reservation.update({ status: refundResult?.percentage === 100 ? "refunded" : "cancelled" });
+
+    logger.info(`Réservation ${reservationId} annulée. Remboursement: ${JSON.stringify(refundResult)}`);
+    res.json({ success: true, reservation: { status: reservation.status }, refund: refundResult });
+
+  } catch (err) {
+    logger.error("Erreur annulation réservation:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get("/api/autocomplete", async (req, res) => {

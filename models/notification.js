@@ -19,6 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       userId: DataTypes.INTEGER,
       Titre: DataTypes.STRING,
       message: DataTypes.STRING,
+      isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
+      type: DataTypes.ENUM(
+        "reservation_new", "reservation_accepted", "reservation_cancelled",
+        "reservation_paid", "message_new", "payout", "system"
+      ),
+      link: DataTypes.STRING,
     },
     {
       sequelize,
