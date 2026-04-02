@@ -7,7 +7,7 @@ apiInstance.setApiKey(
 );
 
 const sendReservationAcceptedEmail = async (user, reservation) => {
-  const reservationLink = `https://moovicar.com/guest/reservation/${reservation.reservationId}`;
+  const reservationLink = `https://app.moovicar.com/guest/reservation/${reservation.reservationId}`;
 
   const emailHtml = `
   <div style="font-family:Arial,sans-serif;background:#f4f6f8;padding:40px 20px;">

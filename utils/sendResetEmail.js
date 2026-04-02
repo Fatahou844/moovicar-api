@@ -7,7 +7,7 @@ apiInstance.setApiKey(
 );
 
 const sendResetEmail = async (user, token) => {
-  const verifyLink = `https://moovicar.com/reset-password/${token}`;
+  const verifyLink = `https://app.moovicar.com/reset-password/${token}`;
 
   const emailHtml = `
   <div style="font-family:Arial,sans-serif; background:#f4f6f8; padding:40px 20px;">

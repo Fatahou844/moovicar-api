@@ -16,7 +16,7 @@ const sendPaymentConfirmationEmail = async ({
   amount,
   vehicle,
 }) => {
-  const resaLink = `https://moovicar.com/guest/reservation/${reservation.reservationId}`;
+  const resaLink = `https://app.moovicar.com/guest/reservation/${reservation.reservationId}`;
 
   const fmtDate = (d) =>
     new Date(d).toLocaleDateString("fr-FR", {

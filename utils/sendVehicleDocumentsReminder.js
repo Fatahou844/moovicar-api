@@ -7,7 +7,7 @@ apiInstance.setApiKey(
 );
 
 const sendVehicleDocumentsReminder = async (user) => {
-  const profileLink = `${process.env.LOCAL_CLIENT_APP}/account/voitures`;
+  const profileLink = `https://app.moovicar.com/account/voitures`;
 
   const emailHtml = `
   <div style="font-family:Arial,sans-serif;background:#f4f6f8;padding:40px 20px;">
