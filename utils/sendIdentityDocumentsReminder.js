@@ -7,7 +7,7 @@ apiInstance.setApiKey(
 );
 
 const sendIdentityDocumentsReminder = async (user) => {
-  const profileLink = `${process.env.LOCAL_CLIENT_APP}/guest/settings`;
+  const profileLink = `https://moovicar.com/guest/settings`;
 
   const emailHtml = `
   <div style="font-family:Arial,sans-serif;background:#f4f6f8;padding:40px 20px;">

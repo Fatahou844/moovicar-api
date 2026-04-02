@@ -9,14 +9,27 @@ apiInstance.setApiKey(
 /**
  * Email de confirmation de paiement — envoyé à l'invité après stripe.confirmPayment()
  */
-const sendPaymentConfirmationEmail = async ({ guest, host, reservation, amount, vehicle }) => {
-  const resaLink = `${process.env.LOCAL_CLIENT_APP}/guest/reservation/${reservation.reservationId}`;
+const sendPaymentConfirmationEmail = async ({
+  guest,
+  host,
+  reservation,
+  amount,
+  vehicle,
+}) => {
+  const resaLink = `https://moovicar.com/guest/reservation/${reservation.reservationId}`;
 
   const fmtDate = (d) =>
-    new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+    new Date(d).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
 
   const fmtEur = (n) =>
-    (parseFloat(n) || 0).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+    (parseFloat(n) || 0).toLocaleString("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    });
 
   const html = `
   <div style="font-family:Arial,sans-serif;background:#f4f6f8;padding:40px 20px;">
@@ -95,11 +108,20 @@ const sendPaymentConfirmationEmail = async ({ guest, host, reservation, amount, 
 /**
  * Email de notification virement — envoyé à l'hôte quand le virement est effectué
  */
-const sendPayoutNotificationEmail = async ({ host, amount, transferId, reservation, vehicle }) => {
-  const earningsLink = `${process.env.LOCAL_CLIENT_APP}/account/earnings`;
+const sendPayoutNotificationEmail = async ({
+  host,
+  amount,
+  transferId,
+  reservation,
+  vehicle,
+}) => {
+  const earningsLink = `https://moovicar.com/account/earnings`;
 
   const fmtEur = (n) =>
-    (parseFloat(n) || 0).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+    (parseFloat(n) || 0).toLocaleString("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+    });
 
   const html = `
   <div style="font-family:Arial,sans-serif;background:#f4f6f8;padding:40px 20px;">
