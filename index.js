@@ -56,19 +56,27 @@ const {
 
 const path = require("path");
 
-const userprofile    = db.UserProfile;
-const MoovicarUsers  = db.MoovicarUsers;
-const Reservation    = db.Reservation;
-const Transaction    = db.Transaction;
-const Paiements      = db.Paiements;
+const userprofile = db.UserProfile;
+const MoovicarUsers = db.MoovicarUsers;
+const Reservation = db.Reservation;
+const Transaction = db.Transaction;
+const Paiements = db.Paiements;
 const ReservationGain = db.ReservationGain;
 
 const cors = require("cors");
 
 // ── Web Push (notifications physiques) ──────────────────────────────────────
-const VAPID_PUBLIC_KEY  = process.env.VAPID_PUBLIC_KEY  || "BAvjxrooUCFHrwKEjOEsuYXU3uObZFVJgsIRAN9hpA7sBqkewxhqcqQVxJ-eFSk0dWFkQWaCcynJSGAFpP2Ots4";
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "ODkuTfEP5DQ7O1SFLOEPzDq4PHyDUI39xx1JWtpG75o";
-webpush.setVapidDetails("mailto:support@moovicar.com", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+const VAPID_PUBLIC_KEY =
+  process.env.VAPID_PUBLIC_KEY ||
+  "BAvjxrooUCFHrwKEjOEsuYXU3uObZFVJgsIRAN9hpA7sBqkewxhqcqQVxJ-eFSk0dWFkQWaCcynJSGAFpP2Ots4";
+const VAPID_PRIVATE_KEY =
+  process.env.VAPID_PRIVATE_KEY ||
+  "ODkuTfEP5DQ7O1SFLOEPzDq4PHyDUI39xx1JWtpG75o";
+webpush.setVapidDetails(
+  "mailto:support@moovicar.com",
+  VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY,
+);
 // ────────────────────────────────────────────────────────────────────────────
 
 const app = express();
@@ -76,10 +84,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "https://app.moovicar.com",
-    ],
+    origin: ["http://localhost:3000", "https://app.moovicar.com"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -221,7 +226,7 @@ io.on("connection", (socket) => {
 app.use((req, res, next) => {
   req.io = io;
   req.userConnections = userConnections;
-  req.webpush = webpush;         // disponible dans tous les contrôleurs
+  req.webpush = webpush; // disponible dans tous les contrôleurs
   req.VAPID_PUBLIC_KEY = VAPID_PUBLIC_KEY;
   next();
 });
@@ -307,7 +312,6 @@ app.post(
 
     try {
       switch (event.type) {
-
         /* ─────────────────────────────────────────────
            Paiement invité confirmé par Stripe
         ───────────────────────────────────────────── */
@@ -320,22 +324,37 @@ app.post(
           const reservation = await Reservation.findOne({
             where: { PaymentIntentId: paymentIntentId },
             include: [
-              { model: userprofile, as: "Host",   attributes: ["id","firstName","lastName","email"] },
-              { model: userprofile, as: "Invite", attributes: ["id","firstName","lastName","email"] },
-              { model: db.Vehicle, attributes: ["id","principalPhotos"],
-                include: [{ model: db.VehicleModel, attributes: ["marque","modele"] }] },
+              {
+                model: userprofile,
+                as: "Host",
+                attributes: ["id", "firstName", "lastName", "email"],
+              },
+              {
+                model: userprofile,
+                as: "Invite",
+                attributes: ["id", "firstName", "lastName", "email"],
+              },
+              {
+                model: db.Vehicle,
+                attributes: ["id", "principalPhotos"],
+                include: [
+                  { model: db.VehicleModel, attributes: ["marque", "modele"] },
+                ],
+              },
             ],
           });
 
           if (!reservation) {
-            logger.warn(`[Webhook] payment_intent.succeeded — aucune résa pour PI ${paymentIntentId}`);
+            logger.warn(
+              `[Webhook] payment_intent.succeeded — aucune résa pour PI ${paymentIntentId}`,
+            );
             break;
           }
 
           // 2. Mettre à jour reservationsGain type "0" → "2" (confirmé)
           await ReservationGain.update(
             { type: "2" },
-            { where: { reservationId: reservation.reservationId, type: "0" } }
+            { where: { reservationId: reservation.reservationId, type: "0" } },
           );
 
           // 3. Créer l'entrée Paiements si elle n'existe pas encore
@@ -344,13 +363,13 @@ app.post(
           });
           if (!existing) {
             await Paiements.create({
-              reservationId:   reservation.reservationId,
-              userId:          reservation.driverInviteId,
-              amount:          amountEur,
-              paiementStatus:  "0",
+              reservationId: reservation.reservationId,
+              userId: reservation.driverInviteId,
+              amount: amountEur,
+              paiementStatus: "0",
               paiement_method: pi.payment_method_types?.[0] || "card",
               paymentIntentId: paymentIntentId,
-              paiementData:    new Date(),
+              paiementData: new Date(),
             });
           } else if (!existing.paymentIntentId) {
             await existing.update({ paymentIntentId, amount: amountEur });
@@ -363,15 +382,19 @@ app.post(
 
           if (reservation.Invite?.email) {
             await sendPaymentConfirmationEmail({
-              guest:       reservation.Invite,
-              host:        reservation.Host,
+              guest: reservation.Invite,
+              host: reservation.Host,
               reservation: reservation,
-              amount:      amountEur,
-              vehicle:     vehicleLabel,
-            }).catch(e => logger.error("[Webhook] Email confirmation error:", e.message));
+              amount: amountEur,
+              vehicle: vehicleLabel,
+            }).catch((e) =>
+              logger.error("[Webhook] Email confirmation error:", e.message),
+            );
           }
 
-          logger.info(`[Webhook] ✅ PI ${paymentIntentId} traité — Resa #${reservation.reservationId}`);
+          logger.info(
+            `[Webhook] ✅ PI ${paymentIntentId} traité — Resa #${reservation.reservationId}`,
+          );
           break;
         }
 
@@ -380,11 +403,11 @@ app.post(
         ───────────────────────────────────────────── */
         case "charge.dispute.created": {
           const dispute = event.data.object;
-          const piId    = dispute.payment_intent;
+          const piId = dispute.payment_intent;
           if (piId) {
             await Paiements.update(
               { paiementStatus: "3" },
-              { where: { paymentIntentId: piId } }
+              { where: { paymentIntentId: piId } },
             );
             logger.info(`[Webhook] Litige ouvert — PI ${piId}`);
           }
@@ -396,14 +419,16 @@ app.post(
         ───────────────────────────────────────────── */
         case "charge.dispute.closed": {
           const dispute = event.data.object;
-          const piId    = dispute.payment_intent;
+          const piId = dispute.payment_intent;
           if (piId) {
             const newStatus = dispute.status === "won" ? "1" : "4";
             await Paiements.update(
               { paiementStatus: newStatus },
-              { where: { paymentIntentId: piId } }
+              { where: { paymentIntentId: piId } },
             );
-            logger.info(`[Webhook] Litige clôturé (${dispute.status}) — PI ${piId}`);
+            logger.info(
+              `[Webhook] Litige clôturé (${dispute.status}) — PI ${piId}`,
+            );
           }
           break;
         }
@@ -413,11 +438,11 @@ app.post(
         ───────────────────────────────────────────── */
         case "charge.refunded": {
           const charge = event.data.object;
-          const piId   = charge.payment_intent;
+          const piId = charge.payment_intent;
           if (piId) {
             await Paiements.update(
               { paiementStatus: "4" },
-              { where: { paymentIntentId: piId } }
+              { where: { paymentIntentId: piId } },
             );
             logger.info(`[Webhook] Remboursement confirmé — PI ${piId}`);
           }
@@ -431,24 +456,33 @@ app.post(
           const transfer = event.data.object;
           const paiement = await Paiements.findOne({
             where: { transactionID: transfer.id },
-            include: [{
-              model: Reservation,
-              attributes: ["reservationId","startDate","endDate","driverHoteId"],
-            }],
+            include: [
+              {
+                model: Reservation,
+                attributes: [
+                  "reservationId",
+                  "startDate",
+                  "endDate",
+                  "driverHoteId",
+                ],
+              },
+            ],
           });
           if (paiement && paiement.Reservation) {
             const host = await userprofile.findOne({
               where: { id: paiement.Reservation.driverHoteId },
-              attributes: ["id","firstName","lastName","email"],
+              attributes: ["id", "firstName", "lastName", "email"],
             });
             if (host?.email) {
               await sendPayoutNotificationEmail({
                 host,
-                amount:      transfer.amount / 100,
-                transferId:  transfer.id,
+                amount: transfer.amount / 100,
+                transferId: transfer.id,
                 reservation: paiement.Reservation,
-                vehicle:     `Réservation #${paiement.Reservation.reservationId}`,
-              }).catch(e => logger.error("[Webhook] Email payout error:", e.message));
+                vehicle: `Réservation #${paiement.Reservation.reservationId}`,
+              }).catch((e) =>
+                logger.error("[Webhook] Email payout error:", e.message),
+              );
             }
           }
           logger.info(`[Webhook] Transfer paid — ${transfer.id}`);
@@ -462,7 +496,7 @@ app.post(
           const payout = event.data.object;
           await Transaction.update(
             { status: "paid" },
-            { where: { stripePayoutId: payout.id } }
+            { where: { stripePayoutId: payout.id } },
           );
           logger.info(`[Webhook] ✅ Payout paid — ${payout.id}`);
           break;
@@ -475,9 +509,11 @@ app.post(
           const payout = event.data.object;
           await Transaction.update(
             { status: "failed" },
-            { where: { stripePayoutId: payout.id } }
+            { where: { stripePayoutId: payout.id } },
           );
-          logger.warn(`[Webhook] ❌ Payout failed — ${payout.id} — raison: ${payout.failure_message}`);
+          logger.warn(
+            `[Webhook] ❌ Payout failed — ${payout.id} — raison: ${payout.failure_message}`,
+          );
           break;
         }
 
@@ -508,11 +544,19 @@ app.post("/api/seed/reservations", async (req, res) => {
     });
 
     if (!annonces.length) {
-      return res.status(404).json({ error: "Aucune annonce active trouvée en base." });
+      return res
+        .status(404)
+        .json({ error: "Aucune annonce active trouvée en base." });
     }
 
     const statuses = [
-      "pending", "accepted", "paid", "in_progress", "completed", "cancelled", "refunded",
+      "pending",
+      "accepted",
+      "paid",
+      "in_progress",
+      "completed",
+      "cancelled",
+      "refunded",
     ];
 
     const created = [];
@@ -522,22 +566,22 @@ app.post("/api/seed/reservations", async (req, res) => {
       if (!hoteId || hoteId === INVITE_ID) continue;
 
       // Dates aléatoires dans les 60 derniers jours
-      const daysAgo   = Math.floor(Math.random() * 50) + 5;
-      const duration  = Math.floor(Math.random() * 5) + 1;
+      const daysAgo = Math.floor(Math.random() * 50) + 5;
+      const duration = Math.floor(Math.random() * 5) + 1;
       const startDate = new Date(Date.now() - daysAgo * 86400000);
-      const endDate   = new Date(startDate.getTime() + duration * 86400000);
-      const amount    = parseFloat(annonce.reservationPrice || 80) * duration;
-      const status    = statuses[Math.floor(Math.random() * statuses.length)];
+      const endDate = new Date(startDate.getTime() + duration * 86400000);
+      const amount = parseFloat(annonce.reservationPrice || 80) * duration;
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
 
       const resa = await db.Reservation.create({
-        driverHoteId:     hoteId,
-        driverInviteId:   INVITE_ID,
-        vehiculeId:       annonce.vehiculeId,
+        driverHoteId: hoteId,
+        driverInviteId: INVITE_ID,
+        vehiculeId: annonce.vehiculeId,
         vehiculeAnnonceId: annonce.vehiculeAnnonceId,
         startDate,
         endDate,
         startEmplacement: annonce.locationAddress || "Paris, France",
-        endEmplacement:   annonce.locationAddress || "Paris, France",
+        endEmplacement: annonce.locationAddress || "Paris, France",
         status,
         isPaidOut: status === "completed" || status === "closed",
       });
@@ -551,17 +595,22 @@ app.post("/api/seed/reservations", async (req, res) => {
         });
 
         await db.Paiements.create({
-          reservationId:   resa.reservationId,
-          userId:          INVITE_ID,
+          reservationId: resa.reservationId,
+          userId: INVITE_ID,
           amount,
-          paiementStatus:  status === "completed" ? "2" : "1",
+          paiementStatus: status === "completed" ? "2" : "1",
           paiement_method: "card",
-          paiementData:    new Date(),
+          paiementData: new Date(),
           TransactionDate: new Date(),
         });
       }
 
-      created.push({ reservationId: resa.reservationId, status, amount, hoteId });
+      created.push({
+        reservationId: resa.reservationId,
+        status,
+        amount,
+        hoteId,
+      });
     }
 
     res.json({ created: created.length, reservations: created });
@@ -586,77 +635,97 @@ app.post("/api/refund-payment", async (req, res) => {
    POST /api/reservations/:reservationId/cancel
    Auth : JWT (le locataire ou le propriétaire peut annuler)
 ───────────────────────────────────────────────────────────────── */
-app.post("/api/reservations/:reservationId/cancel", passport.authenticate("jwt", { session: false }), async (req, res) => {
-  const { reservationId } = req.params;
-  const { computeRefund } = require("./services/refundService");
-  const logger = require("./logger");
+app.post(
+  "/api/reservations/:reservationId/cancel",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const { reservationId } = req.params;
+    const { computeRefund } = require("./services/refundService");
+    const logger = require("./logger");
 
-  try {
-    const reservation = await db.Reservation.findOne({
-      where: { reservationId },
-      include: [
-        {
-          model: db.VehiculeAnnonce,
-          attributes: ["annulationPolicy"],
-        },
-        {
-          model: db.Paiements,
-          required: false,
-        },
-      ],
-    });
+    try {
+      const reservation = await db.Reservation.findOne({
+        where: { reservationId },
+        include: [
+          {
+            model: db.VehiculeAnnonce,
+            attributes: ["annulationPolicy"],
+          },
+          {
+            model: db.Paiements,
+            required: false,
+          },
+        ],
+      });
 
-    if (!reservation) return res.status(404).json({ error: "Réservation introuvable" });
+      if (!reservation)
+        return res.status(404).json({ error: "Réservation introuvable" });
 
-    const cancellableStatuses = ["pending", "accepted", "paid"];
-    if (!cancellableStatuses.includes(reservation.status)) {
-      return res.status(400).json({ error: `Impossible d'annuler une réservation avec le statut "${reservation.status}"` });
-    }
-
-    // Chercher le paiement associé
-    const paiement = await db.Paiements.findOne({
-      where: { reservationId },
-      order: [["createdAt", "DESC"]],
-    });
-
-    let refundResult = null;
-
-    if (paiement && paiement.paymentIntentId) {
-      const policy = reservation.VehiculeAnnonce?.annulationPolicy || "moderate";
-      const { refundAmount, percentage, reason } = computeRefund(
-        policy,
-        reservation.startDate,
-        Math.round(parseFloat(paiement.amount) * 100), // en centimes
-      );
-
-      if (refundAmount > 0) {
-        const stripeRefund = await stripe.refunds.create({
-          payment_intent: paiement.paymentIntentId,
-          amount: refundAmount,
+      const cancellableStatuses = ["pending", "accepted", "paid"];
+      if (!cancellableStatuses.includes(reservation.status)) {
+        return res.status(400).json({
+          error: `Impossible d'annuler une réservation avec le statut "${reservation.status}"`,
         });
-
-        await paiement.update({
-          refundId: stripeRefund.id,
-          paiementStatus: "2", // remboursé
-          notes: reason,
-        });
-
-        refundResult = { percentage, reason, refundAmount: refundAmount / 100, stripeRefundId: stripeRefund.id };
-      } else {
-        refundResult = { percentage: 0, reason, refundAmount: 0 };
       }
+
+      // Chercher le paiement associé
+      const paiement = await db.Paiements.findOne({
+        where: { reservationId },
+        order: [["createdAt", "DESC"]],
+      });
+
+      let refundResult = null;
+
+      if (paiement && paiement.paymentIntentId) {
+        const policy =
+          reservation.VehiculeAnnonce?.annulationPolicy || "moderate";
+        const { refundAmount, percentage, reason } = computeRefund(
+          policy,
+          reservation.startDate,
+          Math.round(parseFloat(paiement.amount) * 100), // en centimes
+        );
+
+        if (refundAmount > 0) {
+          const stripeRefund = await stripe.refunds.create({
+            payment_intent: paiement.paymentIntentId,
+            amount: refundAmount,
+          });
+
+          await paiement.update({
+            refundId: stripeRefund.id,
+            paiementStatus: "2", // remboursé
+            notes: reason,
+          });
+
+          refundResult = {
+            percentage,
+            reason,
+            refundAmount: refundAmount / 100,
+            stripeRefundId: stripeRefund.id,
+          };
+        } else {
+          refundResult = { percentage: 0, reason, refundAmount: 0 };
+        }
+      }
+
+      await reservation.update({
+        status: refundResult?.percentage === 100 ? "refunded" : "cancelled",
+      });
+
+      logger.info(
+        `Réservation ${reservationId} annulée. Remboursement: ${JSON.stringify(refundResult)}`,
+      );
+      res.json({
+        success: true,
+        reservation: { status: reservation.status },
+        refund: refundResult,
+      });
+    } catch (err) {
+      logger.error("Erreur annulation réservation:", err);
+      res.status(500).json({ error: err.message });
     }
-
-    await reservation.update({ status: refundResult?.percentage === 100 ? "refunded" : "cancelled" });
-
-    logger.info(`Réservation ${reservationId} annulée. Remboursement: ${JSON.stringify(refundResult)}`);
-    res.json({ success: true, reservation: { status: reservation.status }, refund: refundResult });
-
-  } catch (err) {
-    logger.error("Erreur annulation réservation:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+  },
+);
 
 app.get("/api/autocomplete", async (req, res) => {
   const { input } = req.query;
