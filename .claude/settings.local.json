@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx sequelize-cli:*)",
       "Read(//c/Users/21266/Desktop/MyCar/**)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(npm install:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdminReservationsPage",
@@ -14,7 +15,9 @@
       "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AccountVoitures",
       "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\VoitureAnnonce",
       "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\components\\MobileBottomNav",
-      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\InboxMessagePage"
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\InboxMessagePage",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\utils",
+      "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src"
     ]
   }
 }

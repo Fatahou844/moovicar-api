@@ -1,4 +1,5 @@
 require("dotenv").config();
+const webpush = require("web-push");
 const express = require("express");
 const nocache = require("nocache");
 const session = require("express-session");
@@ -64,15 +65,23 @@ const ReservationGain = db.ReservationGain;
 
 const cors = require("cors");
 
+// ── Web Push (notifications physiques) ──────────────────────────────────────
+const VAPID_PUBLIC_KEY  = process.env.VAPID_PUBLIC_KEY  || "BAvjxrooUCFHrwKEjOEsuYXU3uObZFVJgsIRAN9hpA7sBqkewxhqcqQVxJ-eFSk0dWFkQWaCcynJSGAFpP2Ots4";
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "ODkuTfEP5DQ7O1SFLOEPzDq4PHyDUI39xx1JWtpG75o";
+webpush.setVapidDetails("mailto:support@moovicar.com", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+// ────────────────────────────────────────────────────────────────────────────
+
 const app = express();
 
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    secure: false,
-    credentials: true, // Permet l'envoi de cookies
+    origin: [
+      "http://localhost:3000",
+      "https://app.moovicar.com",
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 // Utilisez le middleware body-parser pour traiter le corps des requêtes
@@ -177,33 +186,33 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Objet pour stocker les connexions utilisateur
+// Objet pour stocker les connexions utilisateur  userId -> socketId
 const userConnections = {};
 
 io.on("connection", (socket) => {
   logger.info("New client connected");
 
+  // Enregistre l'utilisateur connecté
   socket.on("register", (userId) => {
     userConnections[userId] = socket.id;
+    socket.userId = String(userId);
+    logger.info(`User ${userId} registered socket ${socket.id}`);
   });
 
-  socket.on("reservation", (reservationId) => {
-    userConnections[reservationId] = socket.reservationId;
+  // Rejoint la room d'une réservation (canal de messagerie)
+  socket.on("join-room", (reservationId) => {
+    socket.join(`room:${reservationId}`);
+    logger.info(`Socket ${socket.id} joined room:${reservationId}`);
+  });
+
+  // Quitte la room d'une réservation
+  socket.on("leave-room", (reservationId) => {
+    socket.leave(`room:${reservationId}`);
   });
 
   socket.on("disconnect", () => {
-    for (const [userId, reservationId, socketId] of Object.entries(
-      userConnections,
-    )) {
-      if (socketId === socket.id) {
-        delete userConnections[userId];
-        break;
-      }
-
-      if (socketId === socket.id) {
-        delete userConnections[reservationId];
-        break;
-      }
+    if (socket.userId) {
+      delete userConnections[socket.userId];
     }
     logger.info("Client disconnected");
   });
@@ -212,10 +221,13 @@ io.on("connection", (socket) => {
 app.use((req, res, next) => {
   req.io = io;
   req.userConnections = userConnections;
+  req.webpush = webpush;         // disponible dans tous les contrôleurs
+  req.VAPID_PUBLIC_KEY = VAPID_PUBLIC_KEY;
   next();
 });
 
 //Definitions des routes
+app.use("/api/push", require("./routes/push.routes"));
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/users", users);
 app.use("/api/vehicleModels", vehicleModelRoutes);

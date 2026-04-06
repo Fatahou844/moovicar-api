@@ -92,26 +92,57 @@ exports.getConversations = function (req, res) {
 };
 
 exports.createConversation = async function (req, res) {
-  Conversation.create(req.body)
-    .then((reserv) => {
-      console.log(reserv);
-      if (reserv) {
-        const reservationId = reserv.reservationId;
-        const SocketReservationId = req.userConnections[reservationId];
+  try {
+    const conv = await Conversation.create(req.body);
+    if (!conv) return res.status(400).json(-1);
 
-        if (reservationId) {
-          req.io.emit("conversation", reserv);
-        }
-        res.status(200).json(reserv);
-      } else {
-        res.status(400).json(-1);
+    const reservationId = conv.reservationId;
+
+    // Envoie le message uniquement aux participants de cette réservation
+    // .toJSON() indispensable — socket.io ne sérialise pas les instances Sequelize correctement
+    req.io.to(`room:${reservationId}`).emit("new-message", conv.toJSON());
+
+    // Notification pour l'autre participant
+    const resa = await reservation.findByPk(reservationId);
+    if (resa) {
+      const authorRole = parseInt(conv.authorDriverRole, 10);
+      const recipientId = authorRole === 0 ? resa.driverInviteId : resa.driverHoteId;
+      const notifPayload = {
+        title: "Nouveau message",
+        body: (conv.message || "").substring(0, 100),
+        link: authorRole === 0
+          ? `/guest/chatbox/${reservationId}`          // invité → sa page chat
+          : `/inbox/messages/thread/${reservationId}`, // hôte → sa page chat
+      };
+
+      // ① Socket temps réel (si onglet ouvert)
+      const recipientSocketId = req.userConnections[String(recipientId)];
+      if (recipientSocketId) {
+        req.io.to(recipientSocketId).emit("push-notification", notifPayload);
       }
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log("modeleId from request:", req.body);
-      res.status(500).json({ error: "reservations Internal server error" });
-    });
+
+      // ② Web Push (même si navigateur en arrière-plan / onglet fermé)
+      const PushSubscription = require("../models").PushSubscription;
+      const subs = await PushSubscription.findAll({ where: { userId: recipientId } });
+      for (const sub of subs) {
+        try {
+          await req.webpush.sendNotification(
+            JSON.parse(sub.subscription),
+            JSON.stringify(notifPayload)
+          );
+        } catch (e) {
+          // Subscription expirée ou invalide → on la supprime
+          if (e.statusCode === 410 || e.statusCode === 404) await sub.destroy();
+          else console.error("web-push error:", e.message);
+        }
+      }
+    }
+
+    res.status(200).json(conv);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "conversations Internal server error" });
+  }
 };
 
 exports.getConversationByReservationId = function (req, res) {

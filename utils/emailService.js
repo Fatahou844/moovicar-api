@@ -7,7 +7,7 @@ apiInstance.setApiKey(
 );
 
 const sendVerificationEmail = async (user, token) => {
-  const verifyLink = `${process.env.LOCAL_CLIENT_API}/api/verify?token=${token}`;
+  const verifyLink = `https://app.moovicar.com/api/verify?token=${token}`;
 
   const emailHtml = `
   <div style="font-family:Arial,sans-serif; background:#f4f6f8; padding:40px 20px;">
