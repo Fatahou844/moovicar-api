@@ -4,7 +4,9 @@
       "Bash(npx sequelize-cli:*)",
       "Read(//c/Users/21266/Desktop/MyCar/**)",
       "Bash(xargs grep:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(npm run:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\21266\\Desktop\\MyCar\\moovicar-app\\src\\pages\\AdminReservationsPage",
