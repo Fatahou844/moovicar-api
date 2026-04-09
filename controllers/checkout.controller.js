@@ -67,6 +67,46 @@ exports.getAllCheckouts = async (req, res) => {
   }
 };
 
+exports.previewExtraDistance = async (req, res) => {
+  try {
+    const reservationId = req.params.reservationId;
+
+    const reservation = await Reservation.findByPk(reservationId, {
+      include: [{ model: VehiculeAnnonce }],
+    });
+    const checkout = await Checkout.findOne({ where: { reservationId } });
+    const checkin  = await Checkin.findOne({ where: { reservationId } });
+
+    if (!reservation) return res.status(404).json({ message: "Réservation introuvable" });
+
+    const kmEnd   = parseFloat(checkout?.kmEnd);
+    const kmStart = parseFloat(checkin?.kmStart);
+    const freeKm  = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
+    const pricePerKm = PRICE_PER_EXTRA_KM;
+
+    if (isNaN(kmEnd) || isNaN(kmStart)) {
+      return res.json({ hasExtra: false, kmStart: kmStart || null, kmEnd: kmEnd || null, freeKm, pricePerKm });
+    }
+
+    const distanceParcourue = kmEnd - kmStart;
+    const kmExcess = Math.max(0, distanceParcourue - freeKm);
+    const extraAmount = kmExcess > 0 ? Math.round(kmExcess * pricePerKm * 100) / 100 : 0;
+
+    res.json({
+      hasExtra: kmExcess > 0 && extraAmount >= 0.50,
+      kmStart,
+      kmEnd,
+      freeKm,
+      distanceParcourue,
+      kmExcess,
+      pricePerKm,
+      extraAmount,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.validateCheckout = async (req, res) => {
   try {
     const reservationId = req.params.reservationId;
@@ -84,7 +124,6 @@ exports.validateCheckout = async (req, res) => {
     await checkout.save();
 
     reservation.status = "completed";
-    await reservation.save();
 
     /* ── Paiement supplémentaire km ── */
     let extraChargeResult = null;
@@ -92,9 +131,14 @@ exports.validateCheckout = async (req, res) => {
     const kmStart = parseFloat(checkin?.kmStart);
     const freeKm  = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
 
-    if (!isNaN(kmEnd) && !isNaN(kmStart) && freeKm > 0) {
+    if (!isNaN(kmEnd) && !isNaN(kmStart)) {
       const distanceParcourue = kmEnd - kmStart;
       const kmExcess = Math.max(0, distanceParcourue - freeKm);
+
+      // Snapshot des données de distance sur la réservation
+      reservation.distanceParcourueKm = Math.round(distanceParcourue);
+      reservation.distanceMaxKm       = Math.round(freeKm);
+      reservation.prixParKmSupp       = PRICE_PER_EXTRA_KM;
 
       if (kmExcess > 0) {
         const extraAmount = Math.round(kmExcess * PRICE_PER_EXTRA_KM * 100); // centimes
@@ -118,6 +162,8 @@ exports.validateCheckout = async (req, res) => {
                 description:          `Frais km supplémentaires — résa #${reservationId} (${kmExcess} km × ${PRICE_PER_EXTRA_KM}€)`,
                 metadata: { reservationId: String(reservationId), kmExcess: String(kmExcess) },
               });
+              reservation.extraDistancePaymentIntentId = extraPi.id;
+              reservation.extraDistancePaid            = extraPi.status === "succeeded";
               extraChargeResult = {
                 charged: true,
                 kmExcess,
@@ -133,6 +179,8 @@ exports.validateCheckout = async (req, res) => {
         }
       }
     }
+
+    await reservation.save();
 
     res.json({ message: "Checkout validé", extraCharge: extraChargeResult });
   } catch (err) {

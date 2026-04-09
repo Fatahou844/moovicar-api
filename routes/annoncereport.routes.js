@@ -6,10 +6,11 @@ const passport = require("passport");
 const db = require("../models/index");
 const logger = require("../logger");
 
-const auth = passport.authenticate("user-jwt", { session: false });
+const auth = passport.authenticate("admin-jwt", { session: false });
+const authUser = passport.authenticate("user-jwt", { session: false });
 
 // POST /api/annonce-reports — signaler une annonce
-router.post("/", auth, async (req, res) => {
+router.post("/", authUser, async (req, res) => {
   try {
     const { annonceId, reason, details } = req.body;
     const reporterId = req.user.id;
@@ -67,7 +68,7 @@ router.get("/", auth, async (req, res) => {
 });
 
 // PUT /api/annonce-reports/:id — admin : traiter un signalement
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const { status, adminNote } = req.body;
     const [updated] = await db.AnnonceReport.update(

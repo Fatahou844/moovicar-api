@@ -233,6 +233,7 @@ app.use((req, res, next) => {
 
 //Definitions des routes
 app.use("/api/push", require("./routes/push.routes"));
+app.use("/api/insurance", require("./routes/insurance.routes"));
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/users", users);
 app.use("/api/vehicleModels", vehicleModelRoutes);

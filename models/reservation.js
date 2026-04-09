@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "driverInviteId",
         as: "Invite",
       });
+
+      Reservation.belongsTo(sequelize.models.InsurancePlan, {
+        foreignKey: "insurancePlanId",
+        as: "InsurancePlan",
+      });
     }
   }
   Reservation.init(
@@ -94,11 +99,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       PaymentIntentId: DataTypes.STRING,
-      isPaidOut: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
+      isPaidOut: { type: DataTypes.BOOLEAN, defaultValue: false },
       payoutId: DataTypes.STRING,
+      // ── Distance supplémentaire ──
+      distanceMaxKm:               { type: DataTypes.INTEGER, allowNull: true },
+      distanceParcourueKm:         { type: DataTypes.INTEGER, allowNull: true },
+      prixParKmSupp:               { type: DataTypes.FLOAT,   allowNull: true },
+      extraDistancePaymentIntentId:{ type: DataTypes.STRING,  allowNull: true },
+      extraDistancePaid:           { type: DataTypes.BOOLEAN, defaultValue: false },
+      // ── Assurance ──
+      insurancePlanId: { type: DataTypes.INTEGER, allowNull: true },
+      insuranceFee:    { type: DataTypes.FLOAT,   allowNull: true },
     },
     {
       sequelize,
