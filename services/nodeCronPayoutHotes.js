@@ -23,6 +23,7 @@
 const cron    = require("node-cron");
 const Stripe  = require("stripe");
 const db      = require("../models/index");
+const { sendPushToUser } = require("../utils/sendPushToUser");
 
 const stripe         = new Stripe(process.env.STRIPE_SECRET_KEY);
 const PLATFORM_FEE   = parseFloat(process.env.PLATFORM_FEE_PERCENT || "0.20"); // 20 %
@@ -127,6 +128,18 @@ async function runPayoutBatch() {
       });
 
       console.log(`[Payout Batch] ✅  Resa #${resaId} — Virement ${hostAmount} → ${host.email} (${transfer.id})`);
+
+      // Notification push à l'hôte
+      try {
+        await sendPushToUser(host.id, {
+          title: "Virement reçu",
+          body: `${hostAmount} ont été virés sur votre compte pour la réservation #${resaId}.`,
+          link: "/account/gains",
+        });
+      } catch (pushErr) {
+        console.warn("[Payout Batch] Push notification échouée :", pushErr.message);
+      }
+
       report.success++;
       report.details.push({
         resaId,

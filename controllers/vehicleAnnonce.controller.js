@@ -3,6 +3,7 @@
 const db = require("../models/index");
 const { Op, literal } = require("sequelize");
 const { sendConfirmation } = require("../services/sendConfirmation");
+const { sendPushToUser } = require("../utils/sendPushToUser");
 
 const VehiculeAnnonce = db.VehiculeAnnonce;
 const Vehicle = db.Vehicle;
@@ -319,6 +320,100 @@ exports.getVehiculeAnnoncesByCoordCenters = function (req, res) {
       console.error(error);
       res.status(500).json({ error: "Internal server error" });
     });
+};
+
+/* ── Admin — actions sur une annonce avec notification push ── */
+exports.approveAnnonce = async (req, res) => {
+  try {
+    const annonce = await VehiculeAnnonce.findOne({
+      where: { vehiculeAnnonceId: req.params.id },
+      include: [{ model: Vehicle, attributes: ["userId"] }],
+    });
+    if (!annonce) return res.status(404).json({ error: "Annonce introuvable" });
+
+    await annonce.update({ status: "1" });
+
+    const ownerId = annonce.Vehicle?.userId;
+    if (ownerId) {
+      await sendPushToUser(
+        ownerId,
+        {
+          title: "Annonce approuvée",
+          body: "Votre annonce est maintenant en ligne sur Moovicar !",
+          link: `/account/voitures`,
+        },
+        req.io,
+        req.userConnections
+      );
+    }
+
+    res.json({ message: "Annonce approuvée", annonce });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.rejectAnnonce = async (req, res) => {
+  try {
+    const annonce = await VehiculeAnnonce.findOne({
+      where: { vehiculeAnnonceId: req.params.id },
+      include: [{ model: Vehicle, attributes: ["userId"] }],
+    });
+    if (!annonce) return res.status(404).json({ error: "Annonce introuvable" });
+
+    const reason = req.body.reason || "";
+    await annonce.update({ status: "0" });
+
+    const ownerId = annonce.Vehicle?.userId;
+    if (ownerId) {
+      await sendPushToUser(
+        ownerId,
+        {
+          title: "Annonce refusée",
+          body: reason
+            ? `Votre annonce a été refusée : ${reason}`
+            : "Votre annonce n'a pas été approuvée. Vérifiez les documents requis.",
+          link: `/account/voitures`,
+        },
+        req.io,
+        req.userConnections
+      );
+    }
+
+    res.json({ message: "Annonce refusée", annonce });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.disableAnnonce = async (req, res) => {
+  try {
+    const annonce = await VehiculeAnnonce.findOne({
+      where: { vehiculeAnnonceId: req.params.id },
+      include: [{ model: Vehicle, attributes: ["userId"] }],
+    });
+    if (!annonce) return res.status(404).json({ error: "Annonce introuvable" });
+
+    await annonce.update({ status: "2" });
+
+    const ownerId = annonce.Vehicle?.userId;
+    if (ownerId) {
+      await sendPushToUser(
+        ownerId,
+        {
+          title: "Annonce désactivée",
+          body: "Votre annonce a été temporairement désactivée par un administrateur.",
+          link: `/account/voitures`,
+        },
+        req.io,
+        req.userConnections
+      );
+    }
+
+    res.json({ message: "Annonce désactivée", annonce });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.updateVehiculeAnnonce = function (req, res) {
