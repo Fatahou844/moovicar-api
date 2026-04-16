@@ -236,10 +236,22 @@ router.post(
         return res.status(404).send({ error: "User not found" });
       }
 
+      // Créer le customer Stripe à la volée si absent
+      if (!user.stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || undefined,
+          metadata: { userId: String(user.id) },
+        });
+        user.stripeCustomerId = customer.id;
+        await user.save();
+      }
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100,
         currency: "eur",
         customer: user.stripeCustomerId,
+        setup_future_usage: "off_session", // sauvegarde la carte pour les débits futurs (km supplémentaires)
       });
       res.send({ clientSecret: paymentIntent.client_secret });
     } catch (error) {

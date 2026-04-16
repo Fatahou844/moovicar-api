@@ -201,6 +201,7 @@ io.on("connection", (socket) => {
   socket.on("register", (userId) => {
     userConnections[userId] = socket.id;
     socket.userId = String(userId);
+    socket.join(`user_${userId}`); // room personnelle pour les notifications ciblées
     logger.info(`User ${userId} registered socket ${socket.id}`);
   });
 

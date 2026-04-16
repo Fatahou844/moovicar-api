@@ -522,31 +522,62 @@ router.post(
   },
 );
 
+// Crée un SetupIntent pour sauvegarder un moyen de paiement sans débit immédiat
 router.post(
-  "/add-card",
+  "/create-setup-intent",
   passport.authenticate("user-jwt", { session: false }),
   async (req, res) => {
-    const { email, token } = req.body;
+    const { email } = req.body;
     try {
       const user = await userprofile.findOne({ where: { email } });
-      if (!user) {
-        return res.status(404).send({ error: "User not found" });
-      }
+      if (!user) return res.status(404).send({ error: "User not found" });
 
-      const card = await stripe.customers.createSource(user.stripeCustomerId, {
-        source: token,
-      });
-
-      if (user) {
-        user.last4 = card.last4;
-        user.exp_month = card.exp_month;
-        user.exp_year = card.exp_year;
+      // Créer le customer Stripe si absent
+      if (!user.stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          name: `${user.firstName || ""} ${user.lastName || ""}`.trim() || undefined,
+          metadata: { userId: String(user.id) },
+        });
+        user.stripeCustomerId = customer.id;
         await user.save();
       }
 
-      res.send(card);
+      const setupIntent = await stripe.setupIntents.create({
+        customer: user.stripeCustomerId,
+        payment_method_types: ["card"],
+        usage: "off_session",
+      });
+
+      res.send({ clientSecret: setupIntent.client_secret });
     } catch (error) {
-      logger.error("Erreur lors de l'ajout de la carte:", error);
+      logger.error("Erreur lors de la création du SetupIntent:", error);
+      res.status(500).send(error);
+    }
+  },
+);
+
+// Confirme que la carte a été sauvegardée et met à jour le profil
+router.post(
+  "/confirm-card-setup",
+  passport.authenticate("user-jwt", { session: false }),
+  async (req, res) => {
+    const { email, paymentMethodId } = req.body;
+    try {
+      const user = await userprofile.findOne({ where: { email } });
+      if (!user) return res.status(404).send({ error: "User not found" });
+
+      const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+      if (pm.card) {
+        user.last4 = pm.card.last4;
+        user.exp_month = String(pm.card.exp_month);
+        user.exp_year = String(pm.card.exp_year);
+        await user.save();
+      }
+
+      res.send({ success: true, last4: user.last4 });
+    } catch (error) {
+      logger.error("Erreur lors de la confirmation de la carte:", error);
       res.status(500).send(error);
     }
   },

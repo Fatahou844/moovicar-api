@@ -2,6 +2,7 @@ const db = require("../models");
 const Checkin = db.Checkin;
 const Reservation = db.Reservation;
 const Dispute = db.Dispute;
+const { createNotification } = require("../services/notificationService");
 
 exports.createCheckin = async (req, res) => {
   try {
@@ -12,12 +13,22 @@ exports.createCheckin = async (req, res) => {
       kmStart: req.body.kmStart,
       fuelStart: req.body.fuelStart,
       photos: JSON.stringify(req.body.photos),
-      driverSignature: req.body.driverSignature,
+      signature: req.body.driverSignature,
     });
 
     const reservation = await Reservation.findByPk(reservationId);
     reservation.status = "checkin_pending_validation";
     await reservation.save();
+
+    // Notifier le propriétaire qu'un check-in est soumis
+    await createNotification({
+      userId: reservation.driverHoteId,
+      titre: "Check-in soumis",
+      message: "Le conducteur a soumis le check-in. Veuillez le valider.",
+      type: "checkin_submitted",
+      link: `/host/reservation/${reservationId}`,
+      io: req.io,
+    });
 
     res.status(201).json(checkin);
   } catch (err) {
@@ -87,6 +98,16 @@ exports.validateCheckin = async (req, res) => {
     reservation.status = "in_progress";
     await reservation.save();
 
+    // Notifier le conducteur que le check-in est validé
+    await createNotification({
+      userId: reservation.driverInviteId,
+      titre: "Check-in validé",
+      message: "Votre check-in a été validé par le propriétaire. La location est démarrée.",
+      type: "checkin_validated",
+      link: `/guest/reservation/${reservationId}`,
+      io: req.io,
+    });
+
     res.json({ message: "Check-in validé, location démarrée" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -119,6 +140,16 @@ exports.refuseCheckin = async (req, res) => {
 
     reservation.status = "checkin_refused";
     await reservation.save();
+
+    // Notifier le conducteur que le check-in est refusé
+    await createNotification({
+      userId: reservation.driverInviteId,
+      titre: "Check-in refusé",
+      message: "Le propriétaire a refusé le check-in. Un litige a été ouvert.",
+      type: "checkin_refused",
+      link: `/guest/reservation/${reservationId}`,
+      io: req.io,
+    });
 
     res.json({ message: "Check-in refusé, litige ouvert" });
   } catch (err) {

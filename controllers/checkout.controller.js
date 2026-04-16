@@ -6,6 +6,7 @@ const Reservation = db.Reservation;
 const Checkin = db.Checkin;
 const VehiculeAnnonce = db.VehiculeAnnonce;
 const UserProfile = db.UserProfile;
+const { createNotification } = require("../services/notificationService");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const PRICE_PER_EXTRA_KM = parseFloat(process.env.PRICE_PER_EXTRA_KM || "0.13"); // €/km
@@ -21,6 +22,19 @@ exports.createCheckout = async (req, res) => {
       photos: JSON.stringify(req.body.photos),
       comment: req.body.comment,
     });
+
+    // Notifier le propriétaire qu'un check-out est soumis
+    const reservation = await Reservation.findByPk(reservationId);
+    if (reservation) {
+      await createNotification({
+        userId: reservation.driverHoteId,
+        titre: "Retour soumis",
+        message: "Le conducteur a soumis le retour du véhicule. Veuillez le valider.",
+        type: "checkout_submitted",
+        link: `/host/reservation/${reservationId}`,
+        io: req.io,
+      });
+    }
 
     res.status(201).json(checkout);
   } catch (err) {
@@ -75,25 +89,33 @@ exports.previewExtraDistance = async (req, res) => {
       include: [{ model: VehiculeAnnonce }],
     });
     const checkout = await Checkout.findOne({ where: { reservationId } });
-    const checkin  = await Checkin.findOne({ where: { reservationId } });
+    const checkin = await Checkin.findOne({ where: { reservationId } });
 
-    if (!reservation) return res.status(404).json({ message: "Réservation introuvable" });
+    if (!reservation)
+      return res.status(404).json({ message: "Réservation introuvable" });
 
-    const kmEnd   = parseFloat(checkout?.kmEnd);
+    const kmEnd = parseFloat(checkout?.kmEnd);
     const kmStart = parseFloat(checkin?.kmStart);
-    const freeKm  = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
+    const freeKm = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
     const pricePerKm = PRICE_PER_EXTRA_KM;
 
     if (isNaN(kmEnd) || isNaN(kmStart)) {
-      return res.json({ hasExtra: false, kmStart: kmStart || null, kmEnd: kmEnd || null, freeKm, pricePerKm });
+      return res.json({
+        hasExtra: false,
+        kmStart: kmStart || null,
+        kmEnd: kmEnd || null,
+        freeKm,
+        pricePerKm,
+      });
     }
 
     const distanceParcourue = kmEnd - kmStart;
     const kmExcess = Math.max(0, distanceParcourue - freeKm);
-    const extraAmount = kmExcess > 0 ? Math.round(kmExcess * pricePerKm * 100) / 100 : 0;
+    const extraAmount =
+      kmExcess > 0 ? Math.round(kmExcess * pricePerKm * 100) / 100 : 0;
 
     res.json({
-      hasExtra: kmExcess > 0 && extraAmount >= 0.50,
+      hasExtra: kmExcess > 0 && extraAmount >= 0.5,
       kmStart,
       kmEnd,
       freeKm,
@@ -115,7 +137,7 @@ exports.validateCheckout = async (req, res) => {
       include: [{ model: VehiculeAnnonce }],
     });
     const checkout = await Checkout.findOne({ where: { reservationId } });
-    const checkin  = await Checkin.findOne({ where: { reservationId } });
+    const checkin = await Checkin.findOne({ where: { reservationId } });
 
     if (!checkout)
       return res.status(404).json({ message: "Données introuvables" });
@@ -127,9 +149,9 @@ exports.validateCheckout = async (req, res) => {
 
     /* ── Paiement supplémentaire km ── */
     let extraChargeResult = null;
-    const kmEnd   = parseFloat(checkout.kmEnd);
+    const kmEnd = parseFloat(checkout.kmEnd);
     const kmStart = parseFloat(checkin?.kmStart);
-    const freeKm  = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
+    const freeKm = parseFloat(reservation.VehiculeAnnonce?.distanceOutMin || 0);
 
     if (!isNaN(kmEnd) && !isNaN(kmStart)) {
       const distanceParcourue = kmEnd - kmStart;
@@ -137,33 +159,37 @@ exports.validateCheckout = async (req, res) => {
 
       // Snapshot des données de distance sur la réservation
       reservation.distanceParcourueKm = Math.round(distanceParcourue);
-      reservation.distanceMaxKm       = Math.round(freeKm);
-      reservation.prixParKmSupp       = PRICE_PER_EXTRA_KM;
+      reservation.distanceMaxKm = Math.round(freeKm);
+      reservation.prixParKmSupp = PRICE_PER_EXTRA_KM;
 
       if (kmExcess > 0) {
         const extraAmount = Math.round(kmExcess * PRICE_PER_EXTRA_KM * 100); // centimes
 
         /* Récupère le moyen de paiement depuis le PaymentIntent d'origine */
         const piId = reservation.PaymentIntentId;
-        if (piId && extraAmount >= 50) { // minimum Stripe 0.50€
+        if (piId && extraAmount >= 50) {
+          // minimum Stripe 0.50€
           try {
             const originalPi = await stripe.paymentIntents.retrieve(piId);
             const paymentMethodId = originalPi.payment_method;
-            const customerId      = originalPi.customer;
+            const customerId = originalPi.customer;
 
             if (paymentMethodId && customerId) {
               const extraPi = await stripe.paymentIntents.create({
-                amount:               extraAmount,
-                currency:             "eur",
-                customer:             customerId,
-                payment_method:       paymentMethodId,
-                confirm:              true,
-                off_session:          true,
-                description:          `Frais km supplémentaires — résa #${reservationId} (${kmExcess} km × ${PRICE_PER_EXTRA_KM}€)`,
-                metadata: { reservationId: String(reservationId), kmExcess: String(kmExcess) },
+                amount: extraAmount,
+                currency: "eur",
+                customer: customerId,
+                payment_method: paymentMethodId,
+                confirm: true,
+                off_session: true,
+                description: `Frais km supplémentaires — résa #${reservationId} (${kmExcess} km × ${PRICE_PER_EXTRA_KM}€)`,
+                metadata: {
+                  reservationId: String(reservationId),
+                  kmExcess: String(kmExcess),
+                },
               });
               reservation.extraDistancePaymentIntentId = extraPi.id;
-              reservation.extraDistancePaid            = extraPi.status === "succeeded";
+              reservation.extraDistancePaid = extraPi.status === "succeeded";
               extraChargeResult = {
                 charged: true,
                 kmExcess,
@@ -173,8 +199,16 @@ exports.validateCheckout = async (req, res) => {
               };
             }
           } catch (stripeErr) {
-            console.error("[validateCheckout] Erreur paiement km extra :", stripeErr.message);
-            extraChargeResult = { charged: false, reason: stripeErr.message, kmExcess, amount: extraAmount / 100 };
+            console.error(
+              "[validateCheckout] Erreur paiement km extra :",
+              stripeErr.message,
+            );
+            extraChargeResult = {
+              charged: false,
+              reason: stripeErr.message,
+              kmExcess,
+              amount: extraAmount / 100,
+            };
           }
         }
       }
@@ -182,7 +216,121 @@ exports.validateCheckout = async (req, res) => {
 
     await reservation.save();
 
+    // Notifier le conducteur
+    let checkoutMsg = "Votre retour a été validé par le propriétaire. La location est terminée.";
+    if (extraChargeResult?.charged) {
+      checkoutMsg += ` Un supplément de ${extraChargeResult.amount.toFixed(2)} € a été prélevé pour ${extraChargeResult.kmExcess} km supplémentaires.`;
+    } else if (extraChargeResult && !extraChargeResult.charged) {
+      checkoutMsg += ` Un supplément de ${extraChargeResult.amount.toFixed(2)} € pour km supplémentaires n'a pas pu être prélevé.`;
+    }
+    await createNotification({
+      userId: reservation.driverInviteId,
+      titre: "Retour validé",
+      message: checkoutMsg,
+      type: extraChargeResult?.charged ? "extra_charge" : "checkout_validated",
+      link: `/guest/reservation/${reservationId}`,
+      io: req.io,
+    });
+
     res.json({ message: "Checkout validé", extraCharge: extraChargeResult });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/// ===============================
+/// RETRY EXTRA DISTANCE CHARGE
+/// ===============================
+exports.retryExtraCharge = async (req, res) => {
+  try {
+    const reservationId = req.params.reservationId;
+
+    const reservation = await Reservation.findByPk(reservationId, {
+      include: [{ model: VehiculeAnnonce }],
+    });
+
+    if (!reservation)
+      return res.status(404).json({ message: "Réservation introuvable" });
+
+    if (reservation.extraDistancePaid)
+      return res
+        .status(400)
+        .json({ message: "Frais km supplémentaires déjà encaissés" });
+
+    const kmExcessRaw =
+      (reservation.distanceParcourueKm || 0) - (reservation.distanceMaxKm || 0);
+    const kmExcess = Math.max(0, kmExcessRaw);
+
+    if (kmExcess === 0)
+      return res
+        .status(400)
+        .json({ message: "Aucun km supplémentaire à facturer" });
+
+    const pricePerKm = reservation.prixParKmSupp || PRICE_PER_EXTRA_KM;
+    const extraAmount = Math.round(kmExcess * pricePerKm * 100);
+
+    if (extraAmount < 50)
+      return res
+        .status(400)
+        .json({ message: "Montant inférieur au minimum Stripe (0.50 €)" });
+
+    const piId = reservation.PaymentIntentId;
+    if (!piId)
+      return res
+        .status(400)
+        .json({ message: "PaymentIntent d'origine introuvable" });
+
+    const originalPi = await stripe.paymentIntents.retrieve(piId);
+    const paymentMethodId = originalPi.payment_method;
+    const customerId = originalPi.customer;
+
+    if (!paymentMethodId || !customerId)
+      return res.status(400).json({
+        message:
+          "Moyen de paiement ou client Stripe introuvable" +
+          originalPi.payment_method +
+          "---" +
+          originalPi.customer,
+      });
+
+    const extraPi = await stripe.paymentIntents.create({
+      amount: extraAmount,
+      currency: "eur",
+      customer: customerId,
+      payment_method: paymentMethodId,
+      confirm: true,
+      off_session: true,
+      description: `[RETRY] Frais km supplémentaires — résa #${reservationId} (${kmExcess} km × ${pricePerKm}€)`,
+      metadata: {
+        reservationId: String(reservationId),
+        kmExcess: String(kmExcess),
+        retry: "true",
+      },
+    });
+
+    reservation.extraDistancePaymentIntentId = extraPi.id;
+    reservation.extraDistancePaid = extraPi.status === "succeeded";
+    await reservation.save();
+
+    if (extraPi.status === "succeeded") {
+      await createNotification({
+        userId: reservation.driverInviteId,
+        titre: "Supplément km débité",
+        message: `Un supplément de ${(extraAmount / 100).toFixed(2)} € a été prélevé pour ${kmExcess} km supplémentaires.`,
+        type: "extra_charge",
+        link: `/guest/reservation/${reservationId}`,
+        io: req.io,
+      });
+    }
+
+    res.json({
+      charged: extraPi.status === "succeeded",
+      kmExcess,
+      amount: extraAmount / 100,
+      currency: "eur",
+      paymentIntentId: extraPi.id,
+      status: extraPi.status,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -214,6 +362,16 @@ exports.refuseCheckout = async (req, res) => {
 
     reservation.status = "dispute_open";
     await reservation.save();
+
+    // Notifier le conducteur que le checkout est refusé
+    await createNotification({
+      userId: reservation.driverInviteId,
+      titre: "Retour refusé",
+      message: "Le propriétaire a refusé votre retour. Un litige a été ouvert.",
+      type: "checkout_refused",
+      link: `/guest/reservation/${reservationId}`,
+      io: req.io,
+    });
 
     res.json({ message: "Checkout refusé, litige ouvert" });
   } catch (err) {

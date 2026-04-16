@@ -22,7 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
       type: DataTypes.ENUM(
         "reservation_new", "reservation_accepted", "reservation_cancelled",
-        "reservation_paid", "message_new", "payout", "system"
+        "reservation_paid", "message_new", "payout", "system",
+        "checkin_submitted", "checkin_validated", "checkin_refused",
+        "checkout_submitted", "checkout_validated", "checkout_refused",
+        "extra_charge"
       ),
       link: DataTypes.STRING,
     },
