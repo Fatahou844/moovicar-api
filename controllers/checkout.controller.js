@@ -172,7 +172,28 @@ exports.validateCheckout = async (req, res) => {
           try {
             const originalPi = await stripe.paymentIntents.retrieve(piId);
             const paymentMethodId = originalPi.payment_method;
-            const customerId = originalPi.customer;
+            let customerId = originalPi.customer;
+
+            // Fallback : customer absent sur le PI → récupérer depuis le profil conducteur
+            if (paymentMethodId && !customerId) {
+              const driver = await UserProfile.findByPk(reservation.driverInviteId);
+              if (driver) {
+                if (!driver.stripeCustomerId) {
+                  const customer = await stripe.customers.create({
+                    email: driver.email,
+                    name: `${driver.firstName || ""} ${driver.lastName || ""}`.trim() || undefined,
+                    metadata: { userId: String(driver.id) },
+                  });
+                  driver.stripeCustomerId = customer.id;
+                  await driver.save();
+                }
+                customerId = driver.stripeCustomerId;
+                const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+                if (pm.customer !== customerId) {
+                  await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+                }
+              }
+            }
 
             if (paymentMethodId && customerId) {
               const extraPi = await stripe.paymentIntents.create({
@@ -282,22 +303,89 @@ exports.retryExtraCharge = async (req, res) => {
 
     const originalPi = await stripe.paymentIntents.retrieve(piId);
     const paymentMethodId = originalPi.payment_method;
-    const customerId = originalPi.customer;
+    let customerId = originalPi.customer;
 
-    if (!paymentMethodId || !customerId)
-      return res.status(400).json({
-        message:
-          "Moyen de paiement ou client Stripe introuvable" +
-          originalPi.payment_method +
-          "---" +
-          originalPi.customer,
+    if (!paymentMethodId)
+      return res.status(400).json({ message: "Aucun moyen de paiement trouvé sur ce PaymentIntent." });
+
+    // Si customer absent sur le PI (PI créé avant la mise à jour),
+    // on le récupère depuis le profil du conducteur et on attache le PM
+    if (!customerId) {
+      const driver = await UserProfile.findByPk(reservation.driverInviteId);
+
+      if (!driver)
+        return res.status(400).json({ message: "Profil conducteur introuvable." });
+
+      // Créer le customer Stripe si absent
+      if (!driver.stripeCustomerId) {
+        const customer = await stripe.customers.create({
+          email: driver.email,
+          name: `${driver.firstName || ""} ${driver.lastName || ""}`.trim() || undefined,
+          metadata: { userId: String(driver.id) },
+        });
+        driver.stripeCustomerId = customer.id;
+        await driver.save();
+      }
+
+        customerId = driver.stripeCustomerId;
+
+      // Attacher le payment method au customer s'il ne l'est pas déjà
+      try {
+        const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
+        if (pm.customer !== customerId) {
+          await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+        }
+      } catch (_) {
+        // PM inutilisable — on passera par les cartes sauvegardées ou un lien de paiement
+      }
+    }
+
+    // Chercher une carte valide attachée au customer (PM sauvegardé via setup_future_usage)
+    let resolvedPaymentMethodId = null;
+    if (customerId) {
+      const savedPMs = await stripe.paymentMethods.list({ customer: customerId, type: "card" });
+      if (savedPMs.data.length > 0) {
+        resolvedPaymentMethodId = savedPMs.data[0].id;
+      }
+    }
+
+    // Aucune carte utilisable → générer un lien de paiement Stripe
+    if (!resolvedPaymentMethodId) {
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        customer: customerId || undefined,
+        line_items: [{
+          price_data: {
+            currency: "eur",
+            unit_amount: extraAmount,
+            product_data: {
+              name: `Frais km supplémentaires — résa #${reservationId}`,
+              description: `${kmExcess} km × ${pricePerKm} €/km`,
+            },
+          },
+          quantity: 1,
+        }],
+        metadata: { reservationId: String(reservationId), kmExcess: String(kmExcess) },
+        success_url: `${process.env.CLIENT_URL || "http://localhost:3000"}/guest/reservation/${reservationId}?extra_paid=1`,
+        cancel_url:  `${process.env.CLIENT_URL || "http://localhost:3000"}/guest/reservation/${reservationId}`,
       });
+
+      return res.status(402).json({
+        charged: false,
+        requiresAction: true,
+        paymentUrl: session.url,
+        kmExcess,
+        amount: extraAmount / 100,
+        message: "Aucune carte enregistrée. Un lien de paiement a été généré.",
+      });
+    }
 
     const extraPi = await stripe.paymentIntents.create({
       amount: extraAmount,
       currency: "eur",
       customer: customerId,
-      payment_method: paymentMethodId,
+      payment_method: resolvedPaymentMethodId,
       confirm: true,
       off_session: true,
       description: `[RETRY] Frais km supplémentaires — résa #${reservationId} (${kmExcess} km × ${pricePerKm}€)`,
