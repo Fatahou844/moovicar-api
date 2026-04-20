@@ -3,7 +3,7 @@
 const db = require("../models/index");
 const { Op, literal } = require("sequelize");
 const { sendConfirmation } = require("../services/sendConfirmation");
-const { sendPushToUser } = require("../utils/sendPushToUser");
+const { createNotification } = require("../services/notificationService");
 
 const VehiculeAnnonce = db.VehiculeAnnonce;
 const Vehicle = db.Vehicle;
@@ -335,16 +335,14 @@ exports.approveAnnonce = async (req, res) => {
 
     const ownerId = annonce.Vehicle?.userId;
     if (ownerId) {
-      await sendPushToUser(
-        ownerId,
-        {
-          title: "Annonce approuvée",
-          body: "Votre annonce est maintenant en ligne sur Moovicar !",
-          link: `/account/voitures`,
-        },
-        req.io,
-        req.userConnections
-      );
+      createNotification({
+        userId: ownerId,
+        titre: "Annonce approuvée",
+        message: "Votre annonce est maintenant en ligne sur Moovicar !",
+        type: "system",
+        link: `/account/voitures`,
+        io: req.io,
+      }).catch(console.error);
     }
 
     res.json({ message: "Annonce approuvée", annonce });
@@ -366,18 +364,16 @@ exports.rejectAnnonce = async (req, res) => {
 
     const ownerId = annonce.Vehicle?.userId;
     if (ownerId) {
-      await sendPushToUser(
-        ownerId,
-        {
-          title: "Annonce refusée",
-          body: reason
-            ? `Votre annonce a été refusée : ${reason}`
-            : "Votre annonce n'a pas été approuvée. Vérifiez les documents requis.",
-          link: `/account/voitures`,
-        },
-        req.io,
-        req.userConnections
-      );
+      createNotification({
+        userId: ownerId,
+        titre: "Annonce refusée",
+        message: reason
+          ? `Votre annonce a été refusée : ${reason}`
+          : "Votre annonce n'a pas été approuvée. Vérifiez les documents requis.",
+        type: "system",
+        link: `/account/voitures`,
+        io: req.io,
+      }).catch(console.error);
     }
 
     res.json({ message: "Annonce refusée", annonce });
@@ -398,16 +394,14 @@ exports.disableAnnonce = async (req, res) => {
 
     const ownerId = annonce.Vehicle?.userId;
     if (ownerId) {
-      await sendPushToUser(
-        ownerId,
-        {
-          title: "Annonce désactivée",
-          body: "Votre annonce a été temporairement désactivée par un administrateur.",
-          link: `/account/voitures`,
-        },
-        req.io,
-        req.userConnections
-      );
+      createNotification({
+        userId: ownerId,
+        titre: "Annonce désactivée",
+        message: "Votre annonce a été temporairement désactivée par un administrateur.",
+        type: "system",
+        link: `/account/voitures`,
+        io: req.io,
+      }).catch(console.error);
     }
 
     res.json({ message: "Annonce désactivée", annonce });

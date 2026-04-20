@@ -28,6 +28,7 @@ const deliverylocationRoutes = require("./routes/deliverylocation.routes");
 const reservationcarspreferencesRoutes = require("./routes/reservationcarspreferences.routes");
 const hoteavailabilitiesRoutes = require("./routes/hoteavailabilities.routes");
 const hoteunavailabilitiesRoutes = require("./routes/hoteunaivalabilities.routes");
+const customAvailabilityRoutes = require("./routes/customavailability.routes");
 const reviewRoutes = require("./routes/reviewvehicle.routes");
 const notificationsRoutes = require("./routes/notifications.routes");
 const reservationsRoutes = require("./routes/reservation.routes");
@@ -40,6 +41,7 @@ const localMiddlewareAuth = require("./middlewares/localMiddleware");
 const googleMiddlewareAuth = require("./middlewares/googleMiddleware");
 const stripeMiddleware = require("./middlewares/stripeMiddleware.js");
 const startCronJob = require("./services/nodeCronHotePerformances");
+const { startEvaluationCron } = require("./services/nodeCronEvaluationHotes");
 const {
   sendReservationAcceptedEmail,
 } = require("./utils/sendReservationAcceptedEmail");
@@ -253,6 +255,7 @@ app.use("/api/deliverylocation", deliverylocationRoutes);
 app.use("/api/reservationpreferences", reservationcarspreferencesRoutes);
 app.use("/api/hoteavailabilities", hoteavailabilitiesRoutes);
 app.use("/api/hoteunavailabilities", hoteunavailabilitiesRoutes);
+app.use("/api/customavailabilities", customAvailabilityRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/annonce-reports", require("./routes/annoncereport.routes"));
@@ -803,6 +806,7 @@ require("./services/nodeCronPayoutHotes");
 server.listen(PORT, () => {
   logger.info("Serveur backend lancé sur le port " + PORT);
   // startCronJob();
+  startEvaluationCron();
 });
 
 // Planification : S'exécute par exemple toutes les nuits à minuit (0 0 * * *)

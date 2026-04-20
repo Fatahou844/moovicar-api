@@ -5,6 +5,7 @@ const Sequelize = require("sequelize");
 
 const HoteAvailabilities = db.HoteAvailabilities;
 const UserProfile = db.UserProfile;
+const CustomAvailability = db.CustomAvailability;
 
 exports.getHoteAvailabilitiess = function (req, res) {
   HoteAvailabilities.findAll({
@@ -195,8 +196,8 @@ exports.updateHoteAvailabilitiesByUserId2 = function (req, res) {
         HoteAvailabilities.update(
           {
             ModeAvailability: req.body.ModeAvailability,
-            startTime: "00:00",
-            endTime: "23:59",
+            startTime: req.body.startTime || "00:00",
+            endTime: req.body.endTime || "23:59",
           },
           {
             where: {
@@ -272,4 +273,47 @@ exports.updateHoteAvailabilitiesByUserId3 = function (req, res) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
     });
+};
+
+/**
+ * GET /hoteavailabilities/:userId/for-date?date=YYYY-MM-DD&mode=0
+ * Returns effective availability window for a date (custom > weekly > default).
+ */
+exports.getForDate = async (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const { date, mode = "0" } = req.query;
+  if (!date) return res.status(400).json({ message: "Paramètre date requis (YYYY-MM-DD)" });
+
+  try {
+    if (CustomAvailability) {
+      const custom = await CustomAvailability.findOne({ where: { userId, specificDate: date } });
+      if (custom) {
+        return res.json({ startTime: custom.startTime.slice(0,5), endTime: custom.endTime.slice(0,5), label: custom.label, source: "custom" });
+      }
+    }
+    const d = new Date(date + "T12:00:00Z");
+    const jsDay = d.getUTCDay();
+    const weekday = String(jsDay === 0 ? 6 : jsDay - 1);
+    const weekly = await HoteAvailabilities.findOne({ where: { userId, Weekday: weekday, ModeAvailability: mode } });
+    if (!weekly) return res.json({ startTime: "00:00", endTime: "23:30", source: "none" });
+    if (weekly.alwaysAvailable) return res.json({ startTime: "00:00", endTime: "23:30", source: "always" });
+    return res.json({ startTime: (weekly.startTime||"00:00:00").slice(0,5), endTime: (weekly.endTime||"23:30:00").slice(0,5), source: "weekly" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * GET /hoteavailabilities/:userId/weekly?mode=0
+ * Full weekly schedule for display on listing page.
+ */
+exports.getWeeklySchedule = async (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const { mode = "0" } = req.query;
+  try {
+    const rows = await HoteAvailabilities.findAll({ where: { userId, ModeAvailability: mode }, order: [["Weekday","ASC"]] });
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };

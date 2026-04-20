@@ -3,6 +3,7 @@
 const db = require("../models/index");
 const { Op, col } = require("sequelize");
 const Sequelize = require("sequelize");
+const { createNotification } = require("../services/notificationService");
 
 const vehicle = db.Vehicle;
 const VehicleModel = db.VehicleModel;
@@ -90,22 +91,28 @@ exports.getreservations = function (req, res) {
 };
 
 exports.createreservation = async function (req, res) {
-  reservation
-    .create(req.body)
-    .then((reserv) => {
-      console.log(reserv);
-      if (reserv) {
-        res.status(200).json(reserv);
-        // add reservation gain init
-      } else {
-        res.status(400).json(-1);
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      console.log("modeleId from request:", req.body);
-      res.status(500).json({ error: "reservations Internal server error" });
-    });
+  try {
+    const reserv = await reservation.create(req.body);
+    if (!reserv) return res.status(400).json(-1);
+
+    res.status(200).json(reserv);
+
+    // Notify host about new reservation request
+    if (reserv.driverHoteId) {
+      createNotification({
+        userId: reserv.driverHoteId,
+        titre: "Nouvelle demande de réservation",
+        message: "Un voyageur souhaite louer votre véhicule. Consultez votre espace hôte.",
+        type: "reservation_new",
+        link: `/host/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    }
+  } catch (error) {
+    console.error(error);
+    console.log("modeleId from request:", req.body);
+    res.status(500).json({ error: "reservations Internal server error" });
+  }
 };
 
 exports.getReservationById = function (req, res) {
@@ -375,7 +382,61 @@ exports.updateReservation = async function (req, res) {
       where: { reservationId: id },
     });
 
-    return res.status(200).json(updatedReservation);
+    res.status(200).json(updatedReservation);
+
+    // Push notifications based on status transition
+    const status = updateData.status;
+    const guestId = updatedReservation?.driverInviteId;
+    const hostId  = updatedReservation?.driverHoteId;
+
+    if (status === "accepted" && guestId) {
+      createNotification({
+        userId: guestId,
+        titre: "Réservation acceptée !",
+        message: "Votre demande de réservation a été acceptée par l'hôte. Bon voyage !",
+        type: "reservation_accepted",
+        link: `/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    } else if (status === "rejected" && guestId) {
+      createNotification({
+        userId: guestId,
+        titre: "Réservation refusée",
+        message: "L'hôte n'a pas pu accepter votre demande. Essayez un autre véhicule.",
+        type: "reservation_cancelled",
+        link: `/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    } else if (status === "cancelled" && hostId) {
+      createNotification({
+        userId: hostId,
+        titre: "Réservation annulée",
+        message: "Le voyageur a annulé sa réservation.",
+        type: "reservation_cancelled",
+        link: `/host/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    } else if (status === "paid" && hostId) {
+      createNotification({
+        userId: hostId,
+        titre: "Paiement reçu",
+        message: "Le paiement de votre voyageur a bien été validé.",
+        type: "reservation_paid",
+        link: `/host/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    } else if (status === "completed" && guestId) {
+      createNotification({
+        userId: guestId,
+        titre: "Location terminée",
+        message: "Votre location est terminée. N'oubliez pas de laisser un avis !",
+        type: "system",
+        link: `/reservations`,
+        io: req.io,
+      }).catch(console.error);
+    }
+
+    return;
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });

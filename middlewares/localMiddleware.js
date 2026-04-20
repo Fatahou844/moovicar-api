@@ -886,12 +886,11 @@ router.post("/delete-card", async (req, res) => {
       await stripe.paymentMethods.detach(paymentMethods.data[0].id);
     }
 
-    // 3️⃣ Nettoyer la base
+    // 3️⃣ Nettoyer uniquement les données carte (conserver le customer Stripe)
     await user.update({
       last4: null,
       exp_month: null,
       exp_year: null,
-      stripeCustomerId: null, // si tu veux complètement dissocier
     });
 
     return res.json({ success: true });
