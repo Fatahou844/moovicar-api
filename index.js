@@ -102,7 +102,7 @@ const PORT = process.env.PORT || 3001;
 const stripe = require("stripe")(
   "sk_test_51TMpySL4dNMeENoeOQwnL55A58SscH7Oaw82P2jPRc4jTPJQAKNMRE2u22b7BGuS0zmU8613IcugfSZ9jpgLPhrQ00xL8lWZ9K",
 );
-// This is your Stripe CLI webhook secret for testing your endpoint locally.
+// This is your Stripe CLI webhook secret for testing your endpoint locally.   
 const endpointSecret =
   "whsec_fe3b1cc259b5bb1fed0bc747ef1cceefa7b0f2e7d523260e87e327bd9ebcb27e";
 
