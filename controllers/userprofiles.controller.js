@@ -158,3 +158,34 @@ exports.updateUserProfile = function (req, res) {
     }
   });
 };
+
+/* ── Calcul dynamique des taux de performance d'un hôte ── */
+exports.getPerformanceRates = async function (req, res) {
+  const userId = parseInt(req.params.id);
+  try {
+    const Reservation = db.Reservation;
+    const all = await Reservation.findAll({ where: { driverHoteId: userId } });
+
+    const total     = all.length;
+    const accepted  = all.filter(r => ["accepted","paid","completed"].includes(r.status)).length;
+    const completed = all.filter(r => r.status === "completed").length;
+    const responded = all.filter(r => r.status !== "pending").length;
+
+    const acceptanceRate  = total > 0 ? Math.round((accepted  / total)    * 100) : 0;
+    const responseRate    = total > 0 ? Math.round((responded / total)    * 100) : 0;
+    const engagementRate  = accepted > 0 ? Math.round((completed / accepted) * 100) : 0;
+    const finalizedtrips  = completed;
+
+    // Persist updated rates on the profile
+    await UserProfile.update(
+      { AcceptanceRate: acceptanceRate, ResponseRate: responseRate,
+        EngagementRate: engagementRate, Finalizedtrips: finalizedtrips },
+      { where: { id: userId } }
+    );
+
+    res.json({ acceptanceRate, responseRate, engagementRate, finalizedtrips, total, accepted, completed });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

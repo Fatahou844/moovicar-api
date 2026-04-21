@@ -5,6 +5,10 @@ const { Op, col } = require("sequelize");
 const Sequelize = require("sequelize");
 const { createNotification } = require("../services/notificationService");
 
+const PREAVIS_HOURS   = [1, 2, 3, 6, 12, 24, 48];
+const MIN_DAYS_MAP    = [0, 1, 2, 3, 5];
+const MAX_DAYS_MAP    = [5, 7, 14, 30, 90, Infinity];
+
 const vehicle = db.Vehicle;
 const VehicleModel = db.VehicleModel;
 const UserProfile = db.UserProfile;
@@ -92,6 +96,45 @@ exports.getreservations = function (req, res) {
 
 exports.createreservation = async function (req, res) {
   try {
+    // ── Validate against host reservation preferences ──
+    const { vehiculeAnnonceId, startDate, endDate } = req.body;
+    if (vehiculeAnnonceId && startDate && endDate) {
+      const annonce = await db.VehiculeAnnonce.findOne({ where: { vehiculeAnnonceId } });
+      if (annonce?.vehiculeId) {
+        const prefs = await db.ReservationCarPreferences.findOne({
+          where: { vehiculeId: annonce.vehiculeId },
+        });
+        if (prefs) {
+          const start     = new Date(startDate);
+          const end       = new Date(endDate);
+          const now       = new Date();
+          const durationDays = Math.round((end - start) / 86400000);
+          const hoursUntil   = (start - now) / 3600000;
+
+          const preavisHours = PREAVIS_HOURS[parseInt(prefs.home_preavis)] ?? 1;
+          if (hoursUntil < preavisHours) {
+            return res.status(422).json({
+              error: `Préavis insuffisant. L'hôte demande au moins ${preavisHours}h d'avance.`,
+            });
+          }
+
+          const minDays = MIN_DAYS_MAP[parseInt(prefs.home_minDureeVoyage)] ?? 0;
+          if (minDays > 0 && durationDays < minDays) {
+            return res.status(422).json({
+              error: `Durée minimum : ${minDays} jour(s).`,
+            });
+          }
+
+          const maxDays = MAX_DAYS_MAP[parseInt(prefs.home_maxDureeVoyage)] ?? Infinity;
+          if (durationDays > maxDays) {
+            return res.status(422).json({
+              error: `Durée maximum : ${maxDays} jour(s).`,
+            });
+          }
+        }
+      }
+    }
+
     const reserv = await reservation.create(req.body);
     if (!reserv) return res.status(400).json(-1);
 

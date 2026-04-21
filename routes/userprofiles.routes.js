@@ -6,10 +6,12 @@ const {
   updateUserProfile,
   getUserProfiles,
   getUserProfileById,
+  getPerformanceRates,
 } = require("../controllers/userprofiles.controller");
 
 router.post("/", createUserProfile);
 router.get("/searchbyid/:id", getUserProfileById);
+router.get("/:id/performance", getPerformanceRates);
 router.get("/", getUserProfiles);
 router.put("/:id", updateUserProfile);
 router.delete("/:id/unlink-google", async (req, res) => {
