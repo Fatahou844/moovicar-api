@@ -9,12 +9,14 @@ const {
   getReservationByDriverInviteId,
   updateReservation,
   updateReservationsByDriverInviteIdAndDates,
+  checkAvailability,
 } = require("../controllers/reservation.controller");
 
 router.post("/", createreservation);
 router.get("/getbyid/:id", getReservationById);
 router.put("/:id", updateReservation);
 router.get("/", getreservations);
+router.get("/check-availability/:vehiculeId", checkAvailability);
 router.get("/getbydriverid/:driverHoteId", getReservationByDriverHoteId);
 router.get("/getbyInviteid/:driverInviteId", getReservationByDriverInviteId);
 router.put(
