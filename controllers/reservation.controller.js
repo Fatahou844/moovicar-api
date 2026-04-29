@@ -516,7 +516,7 @@ exports.updateReservation = async function (req, res) {
         message:
           "Votre demande de réservation a été acceptée par l'hôte. Bon voyage !",
         type: "reservation_accepted",
-        link: `/reservations`,
+        link: `/guest/listing/reservations`,
         io: req.io,
       }).catch(console.error);
     } else if (status === "rejected" && guestId) {
@@ -526,7 +526,7 @@ exports.updateReservation = async function (req, res) {
         message:
           "L'hôte n'a pas pu accepter votre demande. Essayez un autre véhicule.",
         type: "reservation_cancelled",
-        link: `/reservations`,
+        link: `/guest/listing/reservations`,
         io: req.io,
       }).catch(console.error);
     } else if (status === "cancelled" && hostId) {
@@ -554,7 +554,7 @@ exports.updateReservation = async function (req, res) {
         message:
           "Votre location est terminée. N'oubliez pas de laisser un avis !",
         type: "system",
-        link: `/reservations`,
+        link: `/guest/listing/reservations`,
         io: req.io,
       }).catch(console.error);
     }
