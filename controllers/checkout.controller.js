@@ -31,7 +31,7 @@ exports.createCheckout = async (req, res) => {
         titre: "Retour soumis",
         message: "Le conducteur a soumis le retour du véhicule. Veuillez le valider.",
         type: "checkout_submitted",
-        link: `/host/reservation/${reservationId}`,
+        link: `/inbox/messages/thread/${reservationId}`,
         io: req.io,
       });
     }

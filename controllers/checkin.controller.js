@@ -26,7 +26,7 @@ exports.createCheckin = async (req, res) => {
       titre: "Check-in soumis",
       message: "Le conducteur a soumis le check-in. Veuillez le valider.",
       type: "checkin_submitted",
-      link: `/host/reservation/${reservationId}`,
+      link: `/inbox/messages/thread/${reservationId}`,
       io: req.io,
     });
 

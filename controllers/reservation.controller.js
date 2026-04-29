@@ -181,7 +181,7 @@ exports.createreservation = async function (req, res) {
         message:
           "Un voyageur souhaite louer votre véhicule. Consultez votre espace hôte.",
         type: "reservation_new",
-        link: `/host/reservations`,
+        link: `/account/demandes`,
         io: req.io,
       }).catch(console.error);
     }
@@ -535,7 +535,7 @@ exports.updateReservation = async function (req, res) {
         titre: "Réservation annulée",
         message: "Le voyageur a annulé sa réservation.",
         type: "reservation_cancelled",
-        link: `/host/reservations`,
+        link: `/account/demandes`,
         io: req.io,
       }).catch(console.error);
     } else if (status === "paid" && hostId) {
@@ -544,7 +544,7 @@ exports.updateReservation = async function (req, res) {
         titre: "Paiement reçu",
         message: "Le paiement de votre voyageur a bien été validé.",
         type: "reservation_paid",
-        link: `/host/reservations`,
+        link: `/account/demandes`,
         io: req.io,
       }).catch(console.error);
     } else if (status === "completed" && guestId) {
