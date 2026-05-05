@@ -283,21 +283,25 @@ app.post("/api/access-authorisation", (req, res) => {
 });
 
 app.post("/api/create-payment-intent", async (req, res) => {
-  const { amount } = req.body;
+  try {
+    const { amount } = req.body;
+    // Stripe exige un entier en centimes — Math.round élimine les imprécisions flottantes
+    const amountCents = Math.round(parseFloat(amount) * 100);
+    if (!amountCents || amountCents < 50) {
+      return res.status(400).json({ error: "Montant invalide (minimum 0.50 €)." });
+    }
 
-  // Create a PaymentIntent with the order amount and currency
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount * 100,
-    currency: "eur",
-    // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amountCents,
+      currency: "eur",
+      automatic_payment_methods: { enabled: true },
+    });
 
-  res.send({
-    clientSecret: paymentIntent.client_secret,
-  });
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.error("[create-payment-intent]", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post(
